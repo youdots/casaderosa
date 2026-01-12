@@ -9,38 +9,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --canvas: #e2d9d5; /* from logo background */
-      --ink: #1f1612;
-      --accent: #a0471a; /* from logo stroke */
-      --shell: #f6f1ee;
+      --canvas: #e2d9d5;
+      --accent: #a0471a;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       background: var(--canvas);
-      color: var(--ink);
+      color: var(--accent);
       font-family: "Work Sans", "Helvetica Neue", Arial, sans-serif;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding: 32px 18px 42px;
+      padding: 28px 16px 40px;
     }
     .frame {
       width: min(1200px, 100%);
-      background: var(--shell);
-      border-radius: 20px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.14);
+      background: var(--canvas);
+      border-radius: 12px;
       overflow: hidden;
-      border: 1px solid rgba(0,0,0,0.04);
     }
     header {
       display: grid;
       grid-template-columns: auto 1fr;
       gap: 16px;
       align-items: center;
-      padding: 26px 32px 20px;
-      background: linear-gradient(120deg, rgba(160,71,26,0.08), rgba(160,71,26,0.02));
+      padding: 22px 22px 18px;
     }
     .brand {
       display: flex;
@@ -48,59 +43,100 @@
       gap: 14px;
     }
     .brand img {
-      height: 60px;
+      height: 96px;
       width: auto;
     }
     .title {
-      font-weight: 600;
+      margin: 0 0 8px;
+      font-size: 20px;
+      line-height: 1.4;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .tagline {
+      margin: 4px 0;
+      font-size: 17px;
       letter-spacing: 0.04em;
       text-transform: uppercase;
       color: var(--accent);
-      margin: 0 0 4px;
-      font-size: 14px;
+      font-weight: 600;
     }
-    .tagline {
-      margin: 0;
-      font-size: 15px;
-      line-height: 1.4;
-      color: var(--ink);
+    .title.address {
+      margin-top: 10px;
+    }
+    .tagline.hours {
+      margin-top: 34px;
+      margin-bottom: 44px;
+      font-size: 21px;
+    }
+    .tagline.updated {
+      font-size: 20px;
+      line-height: 1.6;
+      letter-spacing: 0;
+      text-transform: none;
+      font-weight: 400;
+      margin-top: 8px;
+      display: block;
+      opacity: 0.8;
+    }
+    .inline-link {
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
     }
     .controls {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
       justify-content: flex-end;
       flex-wrap: wrap;
+      font-size: 20px;
+      line-height: 1.6;
+      letter-spacing: 0;
+      text-transform: none;
+      font-weight: 400;
     }
-    .pill {
-      border: 1px solid var(--accent);
-      background: white;
+    .lang {
+      border: none;
+      background: transparent;
       color: var(--accent);
-      padding: 10px 16px;
-      border-radius: 999px;
-      font-weight: 600;
+      padding: 0;
+      font: inherit;
       cursor: pointer;
-      transition: all 140ms ease;
-      font-size: 14px;
+      text-decoration: none;
+      opacity: 0.8;
+      line-height: 1.6;
     }
-    .pill[aria-pressed="true"] {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 8px 18px rgba(160,71,26,0.25);
+    .lang.active {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      opacity: 1;
+    }
+    .sep {
+      opacity: 0.8;
+      user-select: none;
     }
     .summary {
-      padding: 0 32px 10px;
+      padding: 0 22px 10px;
       font-size: 14px;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      color: #5b4b43;
+      display: block;
+      color: var(--accent);
+    }
+    .summary-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      column-gap: 18px;
+      align-items: baseline;
+    }
+    .summary-top .title {
+      margin: 0;
+    }
+    .summary-top .tagline.updated {
+      margin: 0;
     }
     .viewer {
-      background: #fff;
-      padding: 12px;
-      border-top: 1px solid rgba(0,0,0,0.04);
+      padding: 0;
     }
     .panel {
       display: none;
@@ -110,47 +146,31 @@
     }
     .pdf-frame {
       width: 100%;
-      height: 85vh;
-      border: 1px solid rgba(0,0,0,0.08);
+      min-height: 360px;
+      border: none;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: inset 0 1px 0 rgba(0,0,0,0.04);
     }
     .pdf-frame object {
       width: 100%;
       height: 100%;
       border: none;
-      background: #fff;
+      background: var(--canvas);
     }
     .fallback {
       padding: 18px 14px;
       font-size: 14px;
-      color: #5b4b43;
-    }
-    footer {
-      padding: 18px 32px 26px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 14px;
-      border-top: 1px solid rgba(0,0,0,0.06);
-    }
-    .address {
-      font-size: 14px;
-      color: #5b4b43;
-    }
-    .footer-logo {
-      height: 40px;
-      width: 40px;
+      color: var(--accent);
     }
     @media (max-width: 720px) {
       header {
-        grid-template-columns: 1fr;
-        justify-items: flex-start;
+        grid-template-columns: 1fr auto;
+        justify-items: stretch;
       }
-      .controls { width: 100%; justify-content: flex-start; }
-      .pdf-frame { height: 75vh; }
+      .controls { width: auto; justify-content: flex-end; }
+      .summary-top { grid-template-columns: 1fr; row-gap: 6px; }
+      .summary-top .tagline.updated { order: -1; }
+      .tagline.updated { margin-bottom: 24px; }
     }
   </style>
 </head>
@@ -158,28 +178,34 @@
   <div class="frame">
     <header>
       <div class="brand">
-        <img src="Logo-Signet-CdR-Red-Light.svg" alt="Casa de Rosa signet">
         <img src="Logo-CdR-Red-Light.svg" alt="Casa de Rosa logotype">
       </div>
       <div class="controls">
-        <button class="pill" aria-pressed="true" data-lang="en">English</button>
-        <button class="pill" aria-pressed="false" data-lang="es">Español</button>
+        <button class="lang" aria-pressed="false" data-lang="es">ES</button>
+        <span class="sep" aria-hidden="true">|</span>
+        <button class="lang active" aria-pressed="true" data-lang="en">EN</button>
       </div>
     </header>
 
     <div class="summary" data-lang-copy="en">
-      <div>
-        <div class="title">Healthy Breakfast &amp; Lunch · Specialty Coffee · Vinyls</div>
-        <p class="tagline">Mon-Fri 9:00-18:00 · Sat-Sun Closed</p>
+      <div class="summary-top">
+        <p class="title">Healthy Breakfast &amp; Lunch · Specialty Coffee · Vinyls</p>
+        <div class="tagline updated">Updated 12 Jan 2026</div>
       </div>
-      <div class="tagline">Menu updated 12 Jan 2026</div>
+      <p class="title address">
+        <a class="inline-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noreferrer">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a>
+      </p>
+      <p class="tagline hours">Mon-Fri 9:00-18:00 · Sat-Sun Closed</p>
     </div>
     <div class="summary" data-lang-copy="es" style="display:none">
-      <div>
-        <div class="title">Desayunos y comida saludable · Café de especialidad · Vinilos</div>
-        <p class="tagline">Lun-Vie 9:00-18:00 · Sáb-Dom Cerrado</p>
+      <div class="summary-top">
+        <p class="title">Desayunos y comida saludable · Café de especialidad · Vinilos</p>
+        <div class="tagline updated">Menú actualizado 12 Ene 2026</div>
       </div>
-      <div class="tagline">Menú actualizado 12 Ene 2026</div>
+      <p class="title address">
+        <a class="inline-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noreferrer">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a>
+      </p>
+      <p class="tagline hours">Lun-Vie 9:00-18:00 · Sáb-Dom Cerrado</p>
     </div>
 
     <section class="viewer">
@@ -203,34 +229,72 @@
       </div>
     </section>
 
-    <footer>
-      <div class="address">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</div>
-      <img class="footer-logo" src="Logo-Signet-CdR-Red-Light.svg" alt="Casa de Rosa signet">
-    </footer>
   </div>
 
   <script>
-    const buttons = document.querySelectorAll('.pill');
+    const buttons = Array.from(document.querySelectorAll('.lang'));
     const panels = {
       en: document.getElementById('panel-en'),
       es: document.getElementById('panel-es'),
     };
-    const summaries = document.querySelectorAll('[data-lang-copy]');
+    const summaries = Array.from(document.querySelectorAll('[data-lang-copy]'));
+
+    function isSpanishLocale(locale) {
+      const value = String(locale || '').toLowerCase();
+      return value.startsWith('es') || value.startsWith('ca');
+    }
+
+    function getDefaultLanguage() {
+      const locales = Array.isArray(navigator.languages) && navigator.languages.length
+        ? navigator.languages
+        : [navigator.language];
+
+      return locales.some(isSpanishLocale) ? 'es' : 'en';
+    }
+
+    function setLanguage(lang) {
+      const normalized = lang === 'es' ? 'es' : 'en';
+
+      buttons.forEach(b => {
+        const isActive = b.getAttribute('data-lang') === normalized;
+        b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        b.classList.toggle('active', isActive);
+      });
+
+      Object.entries(panels).forEach(([key, panel]) => {
+        panel.classList.toggle('active', key === normalized);
+      });
+
+      summaries.forEach(block => {
+        const match = block.getAttribute('data-lang-copy') === normalized;
+        block.style.display = match ? 'block' : 'none';
+      });
+
+      document.documentElement.lang = normalized;
+      sizePdfFrames();
+    }
 
     buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const lang = btn.getAttribute('data-lang');
-        buttons.forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
-        Object.entries(panels).forEach(([key, panel]) => {
-          panel.classList.toggle('active', key === lang);
-        });
-        summaries.forEach(block => {
-          const match = block.getAttribute('data-lang-copy') === lang;
-          block.style.display = match ? 'flex' : 'none';
-        });
-        document.documentElement.lang = lang;
+      btn.addEventListener('click', (event) => {
+        event.preventDefault();
+        setLanguage(btn.getAttribute('data-lang'));
       });
     });
+
+    function sizePdfFrames() {
+      const active = document.querySelector('.panel.active .pdf-frame');
+      if (!active) return;
+      const rect = active.getBoundingClientRect();
+      const top = Math.min(Math.max(rect.top, 0), window.innerHeight);
+      const height = Math.max(360, Math.floor(window.innerHeight - top));
+      document.querySelectorAll('.pdf-frame').forEach(el => {
+        el.style.height = `${height}px`;
+      });
+    }
+
+    window.addEventListener('resize', sizePdfFrames);
+    window.addEventListener('orientationchange', () => setTimeout(sizePdfFrames, 50));
+    setLanguage(getDefaultLanguage());
   </script>
 </body>
 </html>
