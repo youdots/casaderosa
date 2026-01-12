@@ -315,12 +315,18 @@
       return isSpanishLocale(primary) ? 'es' : 'en';
     }
 
+    const actionLabels = {
+      en: { fullscreen: 'Fullscreen', download: 'Download', share: 'Share', shareTitle: 'Casa de Rosa Menu' },
+      es: { fullscreen: 'Pantalla completa', download: 'Descargar', share: 'Compartir', shareTitle: 'Menú de Casa de Rosa' },
+    };
+
     function setLanguage(lang) {
       const normalized = lang === 'es' ? 'es' : 'en';
       const downloadLink = document.querySelector('[data-action="download"]');
       const shareBtn = document.querySelector('[data-action="share"]');
       const fullscreenBtn = document.querySelector('[data-action="fullscreen"]');
       const pdfSrc = normalized === 'es' ? 'CdR-Menu-2026-01-12-ES.pdf' : 'CdR-Menu-2026-01-12-EN.pdf';
+      const labels = actionLabels[normalized];
 
       buttons.forEach(b => {
         const isActive = b.getAttribute('data-lang') === normalized;
@@ -338,11 +344,15 @@
       });
 
       if (downloadLink) downloadLink.setAttribute('href', pdfSrc);
+      if (downloadLink && labels) downloadLink.textContent = labels.download;
+      if (fullscreenBtn && labels) fullscreenBtn.textContent = labels.fullscreen;
+      if (shareBtn && labels) shareBtn.textContent = labels.share;
       if (shareBtn) shareBtn.style.display = navigator.share ? '' : 'none';
       if (fullscreenBtn) fullscreenBtn.dataset.pdf = pdfSrc;
       if (shareBtn) shareBtn.dataset.pdf = pdfSrc;
 
       document.documentElement.lang = normalized;
+      document.documentElement.dataset.shareTitle = labels ? labels.shareTitle : 'Casa de Rosa Menu';
     }
 
     buttons.forEach(btn => {
@@ -383,7 +393,8 @@
         const pdfUrl = getActivePdfUrl();
         if (!pdfUrl || !navigator.share) return;
         try {
-          await navigator.share({ title: 'Casa de Rosa Menu', url: new URL(pdfUrl, window.location.href).toString() });
+          const title = document.documentElement.dataset.shareTitle || 'Casa de Rosa Menu';
+          await navigator.share({ title, url: new URL(pdfUrl, window.location.href).toString() });
         } catch {
           // ignore cancel
         }
