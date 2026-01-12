@@ -367,9 +367,11 @@
       if (downloadLink && labels) downloadLink.textContent = labels.download;
       if (fullscreenBtn && labels) fullscreenBtn.textContent = labels.fullscreen;
       if (shareBtn && labels) shareBtn.textContent = labels.share;
-      if (shareBtn) shareBtn.style.display = navigator.share ? '' : 'none';
+      if (shareBtn) {
+        shareBtn.style.display = navigator.share ? '' : 'none';
+        shareBtn.dataset.pdf = pdfSrc;
+      }
       if (fullscreenBtn) fullscreenBtn.dataset.pdf = pdfSrc;
-      if (shareBtn) shareBtn.dataset.pdf = pdfSrc;
 
       document.documentElement.lang = normalized;
       document.documentElement.dataset.shareTitle = labels ? labels.shareTitle : 'Casa de Rosa Menu';
@@ -383,13 +385,6 @@
     });
 
     setLanguage(getDefaultLanguage());
-
-    function getActivePdfUrl() {
-      const activeObject = document.querySelector('.panel.active object');
-      if (!activeObject) return null;
-      const raw = activeObject.getAttribute('data') || '';
-      return raw.split('#')[0] || null;
-    }
 
     document.addEventListener('click', async (event) => {
       const target = event.target;
@@ -410,11 +405,10 @@
 
       if (action === 'share') {
         event.preventDefault();
-        const pdfUrl = getActivePdfUrl();
-        if (!pdfUrl || !navigator.share) return;
+        if (!navigator.share) return;
         try {
           const title = document.documentElement.dataset.shareTitle || 'Casa de Rosa Menu';
-          await navigator.share({ title, url: new URL(pdfUrl, window.location.href).toString() });
+          await navigator.share({ title, url: 'https://casaderosaibiza.com' });
         } catch {
           // ignore cancel
         }
