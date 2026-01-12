@@ -12,24 +12,28 @@
       --canvas: #e2d9d5;
       --accent: #a0471a;
       --pad: 22px;
+      --viewer-gap: 16px;
     }
     * { box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
     body {
       margin: 0;
-      min-height: 100vh;
+      height: 100dvh;
       background: var(--canvas);
       color: var(--accent);
       font-family: "Work Sans", "Helvetica Neue", Arial, sans-serif;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 28px 16px 40px;
+      overflow: hidden;
     }
     .frame {
       width: min(1200px, 100%);
+      height: 100%;
+      margin: 0 auto;
       background: var(--canvas);
       border-radius: 12px;
       overflow: hidden;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      min-height: 0;
     }
     header {
       display: grid;
@@ -104,6 +108,11 @@
       text-transform: none;
       font-weight: 400;
     }
+    .actions {
+      display: inline-flex;
+      gap: 12px;
+      align-items: center;
+    }
     .lang {
       border: none;
       background: transparent;
@@ -124,6 +133,18 @@
       opacity: 0.8;
       user-select: none;
     }
+    .action {
+      border: none;
+      background: transparent;
+      color: var(--accent);
+      padding: 0;
+      font: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      opacity: 0.8;
+    }
+    .action:hover { opacity: 1; }
     .summary {
       padding: 0 var(--pad) 10px;
       font-size: 14px;
@@ -143,20 +164,28 @@
       margin: 0;
     }
     .viewer {
-      padding: 0;
+      padding: 0 0 var(--viewer-gap);
+      min-height: 0;
+      overflow: hidden;
+      height: 100%;
     }
     .panel {
       display: none;
+      height: 100%;
     }
     .panel.active {
       display: block;
     }
     .pdf-frame {
       width: 100%;
-      min-height: 360px;
+      height: 100%;
       border: none;
-      border-radius: 12px;
+      border-radius: 0;
       overflow: hidden;
+      background: var(--canvas);
+    }
+    .viewer .pdf-frame {
+      height: calc(100% - var(--viewer-gap));
     }
     .pdf-frame object {
       width: 100%;
@@ -187,9 +216,15 @@
         white-space: nowrap;
       }
       .lang { flex-shrink: 0; }
+      .actions { display: none; }
       .summary-top { grid-template-columns: 1fr; row-gap: 6px; }
       .summary-top .tagline.updated { display: none; }
       .tagline.updated-mobile { display: block; margin-bottom: 24px; }
+      :root { --viewer-gap: 0px; }
+    }
+    @media (max-height: 760px) {
+      header { padding-bottom: 12px; }
+      .tagline.hours { margin-top: 18px; margin-bottom: 28px; }
     }
   </style>
 </head>
@@ -203,6 +238,12 @@
         <button class="lang" aria-pressed="false" data-lang="es">ES</button>
         <span class="sep" aria-hidden="true">|</span>
         <button class="lang active" aria-pressed="true" data-lang="en">EN</button>
+        <span class="sep actions" aria-hidden="true">·</span>
+        <span class="actions">
+          <button class="action" type="button" data-action="fullscreen">Fullscreen</button>
+          <a class="action" data-action="download" href="CdR-Menu-2026-01-12-EN.pdf" download>Download</a>
+          <button class="action" type="button" data-action="share" style="display:none">Share</button>
+        </span>
       </div>
     </header>
 
@@ -276,6 +317,10 @@
 
     function setLanguage(lang) {
       const normalized = lang === 'es' ? 'es' : 'en';
+      const downloadLink = document.querySelector('[data-action="download"]');
+      const shareBtn = document.querySelector('[data-action="share"]');
+      const fullscreenBtn = document.querySelector('[data-action="fullscreen"]');
+      const pdfSrc = normalized === 'es' ? 'CdR-Menu-2026-01-12-ES.pdf' : 'CdR-Menu-2026-01-12-EN.pdf';
 
       buttons.forEach(b => {
         const isActive = b.getAttribute('data-lang') === normalized;
@@ -292,8 +337,12 @@
         block.style.display = match ? 'block' : 'none';
       });
 
+      if (downloadLink) downloadLink.setAttribute('href', pdfSrc);
+      if (shareBtn) shareBtn.style.display = navigator.share ? '' : 'none';
+      if (fullscreenBtn) fullscreenBtn.dataset.pdf = pdfSrc;
+      if (shareBtn) shareBtn.dataset.pdf = pdfSrc;
+
       document.documentElement.lang = normalized;
-      sizePdfFrames();
     }
 
     buttons.forEach(btn => {
@@ -303,20 +352,43 @@
       });
     });
 
-    function sizePdfFrames() {
-      const active = document.querySelector('.panel.active .pdf-frame');
-      if (!active) return;
-      const rect = active.getBoundingClientRect();
-      const top = Math.min(Math.max(rect.top, 0), window.innerHeight);
-      const height = Math.max(360, Math.floor(window.innerHeight - top));
-      document.querySelectorAll('.pdf-frame').forEach(el => {
-        el.style.height = `${height}px`;
-      });
+    setLanguage(getDefaultLanguage());
+
+    function getActivePdfUrl() {
+      const activeObject = document.querySelector('.panel.active object');
+      if (!activeObject) return null;
+      const raw = activeObject.getAttribute('data') || '';
+      return raw.split('#')[0] || null;
     }
 
-    window.addEventListener('resize', sizePdfFrames);
-    window.addEventListener('orientationchange', () => setTimeout(sizePdfFrames, 50));
-    setLanguage(getDefaultLanguage());
+    document.addEventListener('click', async (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const action = target.getAttribute('data-action');
+      if (!action) return;
+
+      if (action === 'fullscreen') {
+        event.preventDefault();
+        const frame = document.querySelector('.panel.active .pdf-frame');
+        if (!frame) return;
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        } else if (frame.requestFullscreen) {
+          await frame.requestFullscreen();
+        }
+      }
+
+      if (action === 'share') {
+        event.preventDefault();
+        const pdfUrl = getActivePdfUrl();
+        if (!pdfUrl || !navigator.share) return;
+        try {
+          await navigator.share({ title: 'Casa de Rosa Menu', url: new URL(pdfUrl, window.location.href).toString() });
+        } catch {
+          // ignore cancel
+        }
+      }
+    });
   </script>
 </body>
 </html>
