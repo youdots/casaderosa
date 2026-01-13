@@ -42,6 +42,9 @@
       --pad: 22px;
       --gap: 12px;
       --radius: 12px;
+      --font-size: 18px;
+      --line-height: 1.5;
+      --para-gap: 10px;
     }
 
     * { box-sizing: border-box; }
@@ -53,6 +56,8 @@
       background: var(--canvas);
       color: var(--accent);
       font-family: "Work Sans", "Helvetica Neue", Arial, sans-serif;
+      font-size: var(--font-size);
+      line-height: var(--line-height);
       overflow: hidden;
     }
 
@@ -107,8 +112,6 @@
       align-items: center;
       gap: var(--gap);
       white-space: nowrap;
-      font-size: 18px;
-      line-height: 1.4;
     }
 
     .actions {
@@ -119,16 +122,12 @@
       align-items: center;
       gap: var(--gap);
       white-space: nowrap;
-      font-size: 18px;
-      line-height: 1.4;
     }
 
     .updated-row {
       display: none;
       grid-area: updated;
-      padding: 0 var(--pad) 12px;
-      font-size: 18px;
-      line-height: 1.5;
+      padding: 0 var(--pad) var(--para-gap);
       white-space: nowrap;
     }
 
@@ -146,7 +145,7 @@
       display: inline;
       vertical-align: baseline;
       text-decoration: underline;
-      text-decoration-thickness: 2px;
+      text-decoration-thickness: 1.5px;
       text-underline-offset: 3px;
       line-height: inherit;
     }
@@ -160,12 +159,10 @@
 
     .copy {
       grid-area: copy;
-      padding: 0 var(--pad) 8px;
-      font-size: 18px;
-      line-height: 1.5;
+      padding: 0 var(--pad) var(--para-gap);
     }
 
-    .copy p { margin: 0 0 10px; }
+    .copy p { margin: 0 0 var(--para-gap); }
     .copy p:last-child { margin-bottom: 0; }
 
     .copy-header {
@@ -173,7 +170,7 @@
       justify-content: space-between;
       align-items: baseline;
       gap: 16px;
-      margin-bottom: 10px;
+      margin-bottom: var(--para-gap);
     }
 
     .updated {
@@ -198,8 +195,8 @@
 
     .fallback {
       padding: 18px 14px;
-      font-size: 14px;
-      line-height: 1.4;
+      font-size: inherit;
+      line-height: inherit;
     }
 
     @media (max-width: 720px) {
@@ -222,14 +219,15 @@
       .langs { padding: 18px var(--pad) 10px 0; }
 
       .actions {
-        padding: 0 var(--pad) 12px;
-        justify-self: start;
+        padding: 0 var(--pad) var(--para-gap);
+        justify-self: end;
+        justify-content: flex-end;
       }
 
       .updated-row { display: block; }
       .copy-header .updated { display: none; }
 
-      .copy { padding: 0 var(--pad) 6px; }
+      .copy { padding: 0 var(--pad) var(--para-gap); }
 
       .copy-header {
         flex-direction: column;
@@ -237,7 +235,8 @@
         gap: 4px;
       }
 
-      .updated { text-align: left; }
+      .updated-row { text-align: right; }
+      .updated { text-align: right; }
     }
   </style>
 </head>
