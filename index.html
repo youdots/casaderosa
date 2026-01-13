@@ -77,10 +77,9 @@
       min-height: 0;
       display: grid;
       grid-template-columns: 1fr auto;
-      grid-template-rows: auto auto auto 1fr;
+      grid-template-rows: auto auto 1fr;
       grid-template-areas:
         "brand langs"
-        "brand actions"
         "copy copy"
         "viewer viewer";
       column-gap: var(--gap);
@@ -117,9 +116,9 @@
 
     .actions {
       grid-area: actions;
-      padding: 0 var(--pad) 14px 0;
+      padding: 0 var(--pad) var(--para-gap);
       justify-self: end;
-      display: flex;
+      display: none;
       align-items: center;
       gap: var(--gap);
       white-space: nowrap;
@@ -174,6 +173,23 @@
       margin-bottom: var(--para-gap);
     }
 
+    .address-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .address-link {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .desktop-actions {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
     .updated {
       white-space: nowrap;
       text-align: right;
@@ -223,12 +239,14 @@
         padding: 0 var(--pad) var(--para-gap);
         justify-self: center;
         justify-content: center;
+        display: flex;
       }
 
       .updated-row { display: block; }
       .copy-header .updated { display: none; }
 
       .copy { padding: 0 var(--pad) calc(var(--para-gap) * 3); }
+      .desktop-actions { display: none; }
 
       .copy-header {
         flex-direction: column;
@@ -270,7 +288,14 @@
         <div class="updated">Updated 12 Jan 2026</div>
       </div>
       <p>
-        <a class="link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noreferrer">Carrer De Font I Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a>
+        <span class="address-row">
+          <a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noreferrer">Carrer De Font I Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a>
+          <span class="desktop-actions">
+            <a class="link" href="CdR-Menu-2026-01-12-EN.pdf" target="_blank" rel="noreferrer">Menu</a>
+            <span class="sep share-sep" aria-hidden="true" style="display:none">|</span>
+            <button class="link" type="button" data-action="share" style="display:none">Share</button>
+          </span>
+        </span>
       </p>
       <p>Mon-Fri 9:00-18:00 | Sat-Sun Closed</p>
     </div>
@@ -281,7 +306,14 @@
         <div class="updated">Menú actualizado 12 Ene 2026</div>
       </div>
       <p>
-        <a class="link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noreferrer">Carrer De Font I Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a>
+        <span class="address-row">
+          <a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noreferrer">Carrer De Font I Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a>
+          <span class="desktop-actions">
+            <a class="link" href="CdR-Menu-2026-01-12-ES.pdf" target="_blank" rel="noreferrer">Menú</a>
+            <span class="sep share-sep" aria-hidden="true" style="display:none">|</span>
+            <button class="link" type="button" data-action="share" style="display:none">Compartir</button>
+          </span>
+        </span>
       </p>
       <p>Lun-Vie 9:00-18:00 | Sáb-Dom Cerrado</p>
     </div>
@@ -306,8 +338,8 @@
     const updatedBlocks = Array.from(document.querySelectorAll('[data-lang-updated]'));
     const pdfPanels = Array.from(document.querySelectorAll('[data-lang-panel]'));
     const menuLink = document.querySelector('[data-action="menu"]');
-    const shareButton = document.querySelector('[data-action="share"]');
-    const shareSeparator = document.querySelector('.share-sep');
+    const shareButtons = Array.from(document.querySelectorAll('[data-action="share"]'));
+    const shareSeparators = Array.from(document.querySelectorAll('.share-sep'));
 
     const ui = {
       en: {
@@ -364,13 +396,13 @@
       }
 
       const canShare = Boolean(navigator.share);
-      if (shareButton) {
-        shareButton.textContent = labels.share;
-        shareButton.style.display = canShare ? '' : 'none';
-        shareButton.dataset.shareTitle = labels.shareTitle;
+      for (const button of shareButtons) {
+        button.textContent = labels.share;
+        button.style.display = canShare ? '' : 'none';
+        button.dataset.shareTitle = labels.shareTitle;
       }
-      if (shareSeparator) {
-        shareSeparator.style.display = canShare ? '' : 'none';
+      for (const sep of shareSeparators) {
+        sep.style.display = canShare ? '' : 'none';
       }
 
       document.documentElement.lang = current;
@@ -383,12 +415,12 @@
       });
     }
 
-    if (shareButton) {
-      shareButton.addEventListener('click', async (event) => {
+    for (const button of shareButtons) {
+      button.addEventListener('click', async (event) => {
         event.preventDefault();
         if (!navigator.share) return;
         try {
-          const title = shareButton.dataset.shareTitle || 'Casa de Rosa';
+          const title = button.dataset.shareTitle || 'Casa de Rosa';
           await navigator.share({ title, url: 'https://casaderosaibiza.com/' });
         } catch {
           // ignore cancel
