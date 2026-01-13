@@ -220,14 +220,14 @@
 
       .actions {
         padding: 0 var(--pad) var(--para-gap);
-        justify-self: end;
-        justify-content: flex-end;
+        justify-self: center;
+        justify-content: center;
       }
 
       .updated-row { display: block; }
       .copy-header .updated { display: none; }
 
-      .copy { padding: 0 var(--pad) var(--para-gap); }
+      .copy { padding: 0 var(--pad) calc(var(--para-gap) * 2); }
 
       .copy-header {
         flex-direction: column;
@@ -235,7 +235,7 @@
         gap: 4px;
       }
 
-      .updated-row { text-align: right; }
+      .updated-row { text-align: center; }
       .updated { text-align: right; }
     }
   </style>
