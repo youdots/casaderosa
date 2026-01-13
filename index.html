@@ -231,9 +231,19 @@
       }
 
       .brand { padding: 18px 0 10px var(--pad); }
-      .brand img { height: 56px; }
+      .brand img {
+        width: clamp(120px, 34vw, 200px);
+        height: auto;
+        max-width: 100%;
+      }
 
-      .langs { padding: 18px var(--pad) 10px 0; }
+      .langs {
+        padding: 18px var(--pad) 10px 0;
+        white-space: normal;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      .langs .sep { display: none; }
 
       .actions {
         padding: 0 var(--pad) var(--para-gap);
