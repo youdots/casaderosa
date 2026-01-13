@@ -33,7 +33,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;500;600&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400&amp;display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -56,6 +56,7 @@
       background: var(--canvas);
       color: var(--accent);
       font-family: "Sora", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 400;
       font-size: var(--font-size);
       line-height: var(--line-height);
       overflow: hidden;
@@ -108,12 +109,9 @@
       grid-area: langs;
       padding: 22px var(--pad) 6px 0;
       justify-self: end;
-      display: flex;
-      align-items: center;
-      gap: var(--gap);
+      text-align: right;
       white-space: nowrap;
     }
-
     .actions {
       grid-area: actions;
       padding: 0 var(--pad) var(--para-gap);
@@ -132,6 +130,7 @@
     }
 
     .sep { user-select: none; }
+    .mobile-break { display: none; }
 
     .link {
       appearance: none;
@@ -145,7 +144,7 @@
       display: inline;
       vertical-align: baseline;
       text-decoration: underline;
-      text-decoration-thickness: 1.5px;
+      text-decoration-thickness: 1.25px;
       text-underline-offset: 3px;
       line-height: inherit;
     }
@@ -220,7 +219,7 @@
       :root { --pad: 18px; }
 
       .frame {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 50% 50%;
         grid-template-rows: auto auto auto auto 1fr;
         grid-template-areas:
           "brand langs"
@@ -241,16 +240,12 @@
       .langs {
         padding: 18px var(--pad) 10px 12px;
         justify-self: stretch;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        row-gap: 0;
-        line-height: var(--line-height);
-      }
-      .langs .link {
-        flex: 0 0 25%;
+        white-space: normal;
         text-align: right;
+        position: relative;
+        z-index: 2;
       }
+      .mobile-break { display: block; height: 0; }
       .langs .sep { display: none; }
 
       .actions {
@@ -263,7 +258,7 @@
       .updated-row { display: block; }
       .copy-header .updated { display: none; }
 
-      .copy { padding: calc(var(--para-gap) * 3) var(--pad); }
+      .copy { padding: calc(var(--para-gap) * 1.5) var(--pad) calc(var(--para-gap) * 3); }
       .desktop-actions { display: none; }
 
       .copy-header {
@@ -285,17 +280,12 @@
 
     <nav class="langs" aria-label="Language">
       <button class="link" type="button" data-lang="es">ES</button>
-      <span class="sep" aria-hidden="true">|</span>
       <button class="link" type="button" data-lang="en" disabled aria-current="true">EN</button>
-      <span class="sep" aria-hidden="true">|</span>
       <button class="link" type="button" data-lang="de">DE</button>
-      <span class="sep" aria-hidden="true">|</span>
       <button class="link" type="button" data-lang="fr">FR</button>
-      <span class="sep" aria-hidden="true">|</span>
+      <span class="mobile-break" aria-hidden="true"></span>
       <button class="link" type="button" data-lang="ua">UA</button>
-      <span class="sep" aria-hidden="true">|</span>
       <button class="link" type="button" data-lang="ru">RU</button>
-      <span class="sep" aria-hidden="true">|</span>
       <button class="link" type="button" data-lang="it">IT</button>
     </nav>
 
@@ -597,6 +587,7 @@
     }
 
     setLanguage(getDefaultLanguage());
+
   </script>
 </body>
 </html>
