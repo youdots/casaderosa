@@ -220,7 +220,7 @@
       :root { --pad: 18px; }
 
       .frame {
-        grid-template-columns: 1fr auto;
+        grid-template-columns: 1fr 1fr;
         grid-template-rows: auto auto auto auto 1fr;
         grid-template-areas:
           "brand langs"
@@ -228,23 +228,25 @@
           "actions actions"
           "updated updated"
           "viewer viewer";
-        column-gap: 24px;
+        column-gap: 0;
       }
 
-      .brand { padding: 18px 0 10px var(--pad); }
+      .brand { padding: 18px 12px 10px var(--pad); }
       .brand img {
-        width: 33.333vw;
-        min-width: 120px;
         height: auto;
-        max-width: min(200px, 100%);
+        width: 100%;
+        max-width: 100%;
       }
 
       .langs {
-        padding: 18px var(--pad) 10px 0;
-        white-space: normal;
-        flex-wrap: wrap;
-        justify-content: flex-end;
+        padding: 18px var(--pad) 10px 12px;
+        justify-self: stretch;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        column-gap: var(--gap);
+        row-gap: 6px;
       }
+      .langs .link { justify-self: end; }
       .langs .sep { display: none; }
 
       .actions {
