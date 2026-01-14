@@ -281,33 +281,6 @@
 	      display: block;
 	    }
 
-	    .chrome-pdfjs {
-	      height: 100%;
-	      overflow: auto;
-	      -webkit-overflow-scrolling: touch;
-	      background: var(--canvas);
-	    }
-
-	    .chrome-pdfjs-inner {
-	      padding: 18px 14px;
-	    }
-
-	    .chrome-pdfjs-pages {
-	      display: flex;
-	      flex-direction: column;
-	      gap: 14px;
-	      padding: 14px;
-	      align-items: center;
-	    }
-
-	    .chrome-pdfjs-pages canvas {
-	      width: 100%;
-	      height: auto;
-	      max-width: 860px;
-	      display: block;
-	      background: white;
-	    }
-
 	    .fallback {
 	      padding: 18px 14px;
 	      font-size: inherit;
@@ -616,10 +589,8 @@
 	    </div>
 
 	    <section class="viewer" aria-label="Menu PDF">
-	      <div class="chrome-pdfjs" data-chrome-viewer hidden>
-	        <div class="chrome-pdfjs-inner">
-	          <div class="chrome-pdfjs-pages" data-chrome-pdfjs-pages></div>
-	        </div>
+	      <div class="fallback" data-android-viewer hidden>
+	        <a class="link" data-android-menu-link href="CdR-Menu-2026-01-12-EN.pdf" target="_blank" rel="noopener noreferrer" tabindex="0">Open the menu (PDF)</a>.
 	      </div>
 	      <object class="pdf" data-lang-panel="en" data="CdR-Menu-2026-01-12-EN.pdf" type="application/pdf" aria-label="Menu PDF (English)">
 	        <div class="fallback">
@@ -660,7 +631,8 @@
 	    const updatedBlocks = Array.from(document.querySelectorAll('[data-lang-updated]'));
 	    const fallbackBlocks = Array.from(document.querySelectorAll('[data-lang-fallback]'));
 	    const pdfPanels = Array.from(document.querySelectorAll('[data-lang-panel]'));
-	    const chromeViewer = document.querySelector('[data-chrome-viewer]');
+	    const androidViewer = document.querySelector('[data-android-viewer]');
+	    const androidMenuLink = document.querySelector('[data-android-menu-link]');
 	    const menuLinks = Array.from(document.querySelectorAll('[data-action="menu"]'));
 	    const impressionsLinks = Array.from(document.querySelectorAll('[data-action="impressions"]'));
 	    const shareButtons = Array.from(document.querySelectorAll('[data-action="share"]'));
@@ -838,9 +810,7 @@
 	      updateSharing({ labels });
 
 	      document.documentElement.lang = labels.langTag || current;
-	      window.__cdrCurrentPdf = labels.pdf;
-	      updateChromePdfUi();
-	      document.dispatchEvent(new CustomEvent('cdr:language', { detail: { pdf: labels.pdf, menu: labels.menu, pdfLang } }));
+	      updateAndroidPdfUi({ labels });
 	    }
 
     for (const link of focusableLinks) {
@@ -867,136 +837,30 @@
       });
 	    }
 
-	    function isLikelyChrome() {
+	    function isLikelyAndroidChrome() {
 	      const ua = String(navigator.userAgent || '');
+	      if (!ua.includes('Android')) return false;
 	      if (!ua.includes('Chrome/')) return false;
-	      if (ua.includes('Edg/') || ua.includes('EdgA/') || ua.includes('OPR/') || ua.includes('SamsungBrowser/')) return false;
+	      if (ua.includes('EdgA/') || ua.includes('OPR/') || ua.includes('SamsungBrowser/')) return false;
 	      return true;
 	    }
 
-	    window.__cdrIsChrome = isLikelyChrome();
+	    window.__cdrIsAndroidChrome = isLikelyAndroidChrome();
 
-	    function updateChromePdfUi() {
-	      const isChrome = Boolean(window.__cdrIsChrome);
-	      if (chromeViewer) chromeViewer.toggleAttribute('hidden', !isChrome);
-	      if (!isChrome) return;
-	      for (const panel of pdfPanels) panel.setAttribute('hidden', '');
+	    function updateAndroidPdfUi({ labels }) {
+	      const isAndroid = Boolean(window.__cdrIsAndroidChrome);
+	      if (androidViewer) androidViewer.toggleAttribute('hidden', !isAndroid);
+	      if (isAndroid) {
+	        for (const panel of pdfPanels) panel.setAttribute('hidden', '');
+	      }
+	      if (isAndroid && androidMenuLink) {
+	        androidMenuLink.setAttribute('href', labels.pdf);
+	        androidMenuLink.textContent = `${labels.menu} (PDF)`;
+	      }
 	    }
 
 	    setLanguage(getDefaultLanguage());
 
-	  </script>
-	  <script type="module">
-	    const isChrome = Boolean(window.__cdrIsChrome);
-	    if (!isChrome) {
-	      // no-op for non-Android; desktop/iOS keep the native PDF embed.
-	      // (Using a module script so we can import PDF.js cleanly.)
-	    } else {
-	      const viewer = document.querySelector('[data-chrome-viewer]');
-	      const pagesContainer = document.querySelector('[data-chrome-pdfjs-pages]');
-
-	      const PDFJS_VERSION = '5.4.530';
-	      const PDFJS_BASE = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSION}/build/`;
-	      const PDFJS_SRC = `${PDFJS_BASE}pdf.mjs`;
-	      const PDFJS_WORKER_SRC = `${PDFJS_BASE}pdf.worker.min.mjs`;
-
-	      let pdfjsPromise;
-	      let renderToken = 0;
-	      let lastPdfUrl = null;
-
-	      async function loadPdfJs() {
-	        if (pdfjsPromise) return pdfjsPromise;
-	        pdfjsPromise = import(PDFJS_SRC).then((lib) => {
-	          lib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_SRC;
-	          return lib;
-	        });
-	        return pdfjsPromise;
-	      }
-
-	      function absoluteUrl(url) {
-	        return new URL(url, window.location.href).toString();
-	      }
-
-	      function clearPages() {
-	        if (pagesContainer) pagesContainer.replaceChildren();
-	      }
-
-	      function getAvailableWidth() {
-	        const width = pagesContainer?.clientWidth || viewer?.clientWidth || 600;
-	        return Math.max(320, width);
-	      }
-
-	      async function renderPdf(pdfUrl) {
-	        if (!viewer || viewer.hasAttribute('hidden')) return;
-	        if (!pagesContainer) return;
-
-	        const token = (renderToken += 1);
-	        lastPdfUrl = pdfUrl;
-	        clearPages();
-
-	        let pdfjsLib;
-	        try {
-	          pdfjsLib = await loadPdfJs();
-	        } catch {
-	          return;
-	        }
-
-	        try {
-	          const loadingTask = pdfjsLib.getDocument({ url: pdfUrl });
-	          const pdf = await loadingTask.promise;
-	          if (token !== renderToken) return;
-
-	          const availableWidth = getAvailableWidth();
-	          const outputScale = window.devicePixelRatio || 1;
-
-	          for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
-	            const page = await pdf.getPage(pageNumber);
-	            if (token !== renderToken) return;
-
-	            const viewport = page.getViewport({ scale: 1 });
-	            const scale = availableWidth / viewport.width;
-	            const scaledViewport = page.getViewport({ scale });
-
-	            const canvas = document.createElement('canvas');
-	            const context = canvas.getContext('2d', { alpha: false });
-	            canvas.width = Math.floor(scaledViewport.width * outputScale);
-	            canvas.height = Math.floor(scaledViewport.height * outputScale);
-	            canvas.style.width = `${Math.floor(scaledViewport.width)}px`;
-	            canvas.style.height = `${Math.floor(scaledViewport.height)}px`;
-	            pagesContainer.appendChild(canvas);
-
-	            await page.render({
-	              canvasContext: context,
-	              viewport: scaledViewport,
-	              transform: outputScale === 1 ? null : [outputScale, 0, 0, outputScale, 0, 0],
-	            }).promise;
-	          }
-	        } catch {
-	          clearPages();
-	        }
-	      }
-
-	      let resizeTimer;
-	      function scheduleRerender() {
-	        if (!lastPdfUrl) return;
-	        window.clearTimeout(resizeTimer);
-	        resizeTimer = window.setTimeout(() => renderPdf(lastPdfUrl), 200);
-	      }
-
-	      window.addEventListener('resize', scheduleRerender);
-
-	      document.addEventListener('cdr:language', (event) => {
-	        const detail = event?.detail || {};
-	        const pdf = detail.pdf;
-	        if (!pdf) return;
-
-	        const url = absoluteUrl(pdf);
-	        renderPdf(url);
-	      });
-
-	      const initialPdf = window.__cdrCurrentPdf;
-	      if (initialPdf) renderPdf(absoluteUrl(initialPdf));
-	    }
 	  </script>
 	</body>
 	</html>
