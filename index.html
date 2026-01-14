@@ -227,20 +227,24 @@
     .copy p { margin: 0 0 var(--para-gap); }
     .copy p:last-child { margin-bottom: 0; }
 
-    .copy-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 16px;
-      margin-bottom: var(--para-gap);
-    }
+	    .copy-header {
+	      display: flex;
+	      justify-content: space-between;
+	      align-items: baseline;
+	      gap: 16px;
+	      margin-bottom: var(--para-gap);
+	    }
 
-    .address-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
-    }
+	    .tagline {
+	      font-size: calc(var(--font-size) + 2px);
+	    }
+
+	    .address-row {
+	      display: flex;
+	      align-items: baseline;
+	      justify-content: space-between;
+	      gap: 16px;
+	    }
 
     .address-link-wrap {
       flex: 1;
@@ -354,19 +358,19 @@
         margin-top: calc(var(--para-gap) * 2);
       }
 
-      .actions {
-        padding: 0 var(--pad) var(--para-gap);
-        justify-self: center;
-        display: block;
-        text-align: center;
-      }
+	      .actions {
+	        padding: 0 var(--pad) calc(var(--para-gap) * 0.75);
+	        justify-self: center;
+	        display: block;
+	        text-align: center;
+	      }
 
-	      .updated-row { display: block; }
+	      .updated-row { display: block; padding: 0 var(--pad) calc(var(--para-gap) * 0.5); }
 	      .copy-header .updated { display: none; }
 	      .hours-row { display: block; }
 	      .hours-row .updated { display: none; }
 
-	      .copy { padding: calc(var(--para-gap) * 1.5) var(--pad) calc(var(--para-gap) * 3); }
+	      .copy { padding: calc(var(--para-gap) * 1.5) var(--pad) calc(var(--para-gap) * 2); }
 	      .desktop-actions { display: none; }
 
       .copy-header {
@@ -423,7 +427,7 @@
 
 	    <main id="main" class="copy" data-lang-copy="en">
 	      <div class="copy-header">
-	        <div>Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls</div>
+	        <div class="tagline">Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls</div>
 	      </div>
       <p>
         <span class="address-row">
@@ -440,7 +444,7 @@
 
 	    <div class="copy" data-lang-copy="es" hidden>
 	      <div class="copy-header">
-	        <div>Desayunos y comida saludable | Café de especialidad | Vinilos</div>
+	        <div class="tagline">Desayunos y comida saludable | Café de especialidad | Vinilos</div>
 	      </div>
       <p>
         <span class="address-row">
@@ -457,7 +461,7 @@
 
 	    <div class="copy" data-lang-copy="de" hidden>
 	      <div class="copy-header">
-	        <div>Gesundes Frühstück &amp; Mittagessen | Spezialitätenkaffee | Vinyl</div>
+	        <div class="tagline">Gesundes Frühstück &amp; Mittagessen | Spezialitätenkaffee | Vinyl</div>
 	      </div>
       <p>
         <span class="address-row">
@@ -474,7 +478,7 @@
 
 	    <div class="copy" data-lang-copy="fr" hidden>
 	      <div class="copy-header">
-	        <div>Petit-déjeuner &amp; déjeuner sains | Café de spécialité | Vinyles</div>
+	        <div class="tagline">Petit-déjeuner &amp; déjeuner sains | Café de spécialité | Vinyles</div>
 	      </div>
       <p>
         <span class="address-row">
@@ -491,7 +495,7 @@
 
 	    <div class="copy" data-lang-copy="nl" hidden>
 	      <div class="copy-header">
-	        <div>Gezond ontbijt &amp; lunch | Specialty koffie | Vinyl</div>
+	        <div class="tagline">Gezond ontbijt &amp; lunch | Specialty koffie | Vinyl</div>
 	      </div>
       <p>
         <span class="address-row">
@@ -508,7 +512,7 @@
 
 	    <div class="copy" data-lang-copy="pt" hidden>
 	      <div class="copy-header">
-	        <div>Pequeno-almoço e almoço saudáveis | Café de especialidade | Vinil</div>
+	        <div class="tagline">Pequeno-almoço e almoço saudáveis | Café de especialidade | Vinil</div>
 	      </div>
       <p>
         <span class="address-row">
@@ -525,7 +529,7 @@
 
 	    <div class="copy" data-lang-copy="he" hidden>
 	      <div class="copy-header">
-	        <div>ארוחת בוקר וצוהריים בריאה | קפה ספיישלטי | תקליטי ויניל</div>
+	        <div class="tagline">ארוחת בוקר וצוהריים בריאה | קפה ספיישלטי | תקליטי ויניל</div>
 	      </div>
       <p>
         <span class="address-row">
@@ -542,7 +546,7 @@
 
 	    <div class="copy" data-lang-copy="ar" hidden>
 	      <div class="copy-header">
-	        <div>إفطار وغداء صحي | قهوة مختصة | أسطوانات فينيل</div>
+	        <div class="tagline">إفطار وغداء صحي | قهوة مختصة | أسطوانات فينيل</div>
 	      </div>
       <p>
         <span class="address-row">
@@ -559,7 +563,7 @@
 
 	    <div class="copy" data-lang-copy="ua" hidden>
 	      <div class="copy-header">
-	        <div>Корисні сніданки та обіди | Спешелті кава | Вініл</div>
+	        <div class="tagline">Корисні сніданки та обіди | Спешелті кава | Вініл</div>
 	      </div>
       <p>
         <span class="address-row">
@@ -576,7 +580,7 @@
 
 	    <div class="copy" data-lang-copy="ru" hidden>
 	      <div class="copy-header">
-	        <div>Полезные завтраки и обеды | Спешелти-кофе | Винил</div>
+	        <div class="tagline">Полезные завтраки и обеды | Спешелти-кофе | Винил</div>
 	      </div>
       <p>
         <span class="address-row">
@@ -593,7 +597,7 @@
 
 	    <div class="copy" data-lang-copy="it" hidden>
 	      <div class="copy-header">
-	        <div>Colazione e pranzo salutari | Caffè specialty | Vinili</div>
+	        <div class="tagline">Colazione e pranzo salutari | Caffè specialty | Vinili</div>
 	      </div>
       <p>
         <span class="address-row">
