@@ -363,13 +363,18 @@
         text-align: center;
       }
 
-	      .updated-row { display: block; }
-	      .copy-header .updated { display: none; }
-	      .hours-row { display: block; }
-	      .hours-row .updated { display: none; }
+		      .updated-row { display: block; }
+		      .copy-header .updated { display: none; }
+		      .hours-row { display: block; order: 1; margin-bottom: var(--para-gap); }
+		      .hours-row .updated { display: none; }
 
-	      .copy { padding: calc(var(--para-gap) * 1.5) var(--pad) calc(var(--para-gap) * 3); }
-	      .desktop-actions { display: none; }
+	      .copy {
+          padding: calc(var(--para-gap) * 1.5) var(--pad) 20px;
+          display: flex;
+          flex-direction: column;
+        }
+	        .address-row-wrap { order: 2; margin-bottom: 0; }
+		      .desktop-actions { display: none; }
 
       .copy-header {
         flex-direction: column;
@@ -427,7 +432,7 @@
 	      <div class="copy-header">
 	        <div>Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
@@ -444,7 +449,7 @@
 	      <div class="copy-header">
 	        <div>Desayunos y comida saludable | Café de especialidad | Vinilos</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
@@ -461,7 +466,7 @@
 	      <div class="copy-header">
 	        <div>Gesundes Frühstück &amp; Mittagessen | Spezialitätenkaffee | Vinyl</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
@@ -478,7 +483,7 @@
 	      <div class="copy-header">
 	        <div>Petit-déjeuner &amp; déjeuner sains | Café de spécialité | Vinyles</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
@@ -495,7 +500,7 @@
 	      <div class="copy-header">
 	        <div>Gezond ontbijt &amp; lunch | Specialty koffie | Vinyl</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
@@ -512,7 +517,7 @@
 	      <div class="copy-header">
 	        <div>Pequeno-almoço e almoço saudáveis | Café de especialidade | Vinil</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
@@ -529,7 +534,7 @@
 	      <div class="copy-header">
 	        <div>ארוחת בוקר וצוהריים בריאה | קפה ספיישלטי | תקליטי ויניל</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
@@ -546,7 +551,7 @@
 	      <div class="copy-header">
 	        <div>إفطار وغداء صحي | قهوة مختصة | أسطوانات فينيل</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
@@ -563,7 +568,7 @@
 	      <div class="copy-header">
 	        <div>Корисні сніданки та обіди | Спешелті кава | Вініл</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
@@ -580,7 +585,7 @@
 	      <div class="copy-header">
 	        <div>Полезные завтраки и обеды | Спешелти-кофе | Винил</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
@@ -597,7 +602,7 @@
 	      <div class="copy-header">
 	        <div>Colazione e pranzo salutari | Caffè specialty | Vinili</div>
 	      </div>
-      <p>
+      <p class="address-row-wrap">
         <span class="address-row">
           <span class="address-link-wrap"><a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a></span>
           <span class="desktop-actions nav-items">
