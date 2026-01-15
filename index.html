@@ -180,6 +180,13 @@
       white-space: nowrap;
     }
 
+    .address-bar {
+      grid-area: address;
+      display: none;
+      padding: 0 var(--pad) var(--para-gap);
+      text-align: center;
+    }
+
     .updated-row {
       display: none;
       grid-area: updated;
@@ -327,6 +334,7 @@
           "brand langs"
           "copy copy"
           "actions actions"
+          "address address"
           "updated updated"
           "viewer viewer";
         column-gap: 0;
@@ -363,17 +371,15 @@
         text-align: center;
       }
 
+        .address-bar { display: block; font-size: 16px; }
+
 		      .updated-row { display: block; text-align: center; font-size: 16px; }
 		      .copy-header .updated { display: none; }
-		      .copy p.hours-row { display: block; order: 1; margin-bottom: var(--para-gap); }
+		      .copy p.hours-row { display: block; margin-bottom: var(--para-gap); }
 		      .hours-row .updated { display: none; }
 
-		      .copy {
-	          padding: calc(var(--para-gap) * 1.5) var(--pad) 20px;
-	          display: flex;
-	          flex-direction: column;
-	        }
-		        .copy p.address-row-wrap { order: 2; margin-bottom: 0; font-size: 16px; }
+		      .copy { padding: calc(var(--para-gap) * 1.5) var(--pad) 20px; }
+        .copy p.address-row-wrap { display: none; }
 			      .desktop-actions { display: none; }
 
       .copy-header {
@@ -412,6 +418,10 @@
       <a class="link" data-action="impressions" href="https://www.instagram.com/casaderosa_ibiza/" target="_blank" rel="noopener noreferrer" tabindex="0">Impressions</a>
       <button class="link" type="button" data-action="share" style="display:none">Share</button>
     </nav>
+
+    <div class="address-bar" aria-label="Address">
+      <a class="link address-link" href="https://maps.app.goo.gl/YesgsyjPg6qBRamg9" target="_blank" rel="noopener noreferrer" tabindex="0">Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</a>
+    </div>
 
     <div class="updated-row" aria-label="Last updated" aria-live="polite">
       <div data-lang-updated="en">Updated 12 January 2026</div>
