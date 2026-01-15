@@ -333,8 +333,9 @@
 	      line-height: inherit;
 	    }
 
-    @media (max-width: 900px) {
-      :root { --pad: 18px; }
+	    @media (max-width: 900px) {
+	      :root { --pad: 18px; }
+	      :root { --mobile-center-margin: 20px; }
 
 	      .frame {
 	        grid-template-columns: 42% 58%;
@@ -374,16 +375,17 @@
       }
 
 	      .actions {
-	        padding: 0 15px var(--para-gap);
+	        padding: 0 0 var(--para-gap);
+	        margin: 0 var(--mobile-center-margin);
 	        justify-self: center;
 	        display: block;
 	        text-align: center;
 	        font-size: 20px;
 	      }
 
-	        .address-bar { display: block; font-size: inherit; padding: 0 15px 15px; }
+	        .address-bar { display: block; font-size: inherit; padding: 0 0 15px; margin: 0 var(--mobile-center-margin); }
 
-		      .updated-row { display: block; text-align: center; font-size: inherit; padding-left: 15px; padding-right: 15px; }
+		      .updated-row { display: block; text-align: center; font-size: inherit; margin: 0 var(--mobile-center-margin); padding: 0 0 var(--para-gap); }
 		      .copy-header .updated { display: none; }
 		      .copy p.hours-row { display: block; margin-bottom: var(--para-gap); }
 		      .hours-row .updated { display: none; }
