@@ -40,6 +40,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&amp;display=swap" rel="stylesheet">
   <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://plausible.youdots.com/js/pa-H5jDztFxXG8Ivu944Q4bf.js"></script>
   <script>
@@ -391,19 +392,32 @@
       cursor: pointer;
       position: absolute;
       top: 6px;
-      left: 12px;
-      right: auto;
+      right: 12px;
+      left: auto;
       z-index: 2;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 42px;
+      gap: 8px;
+      font-size: 16px;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0;
       line-height: 1;
+      text-decoration: none;
     }
 
     .impressions-close:focus { outline: none; }
+
+    .impressions-close-icon {
+      font-size: 42px;
+      line-height: 1;
+    }
+
+    .impressions-close-label {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 700;
+      text-decoration: none;
+    }
 
     .impressions-body {
       flex: 1;
@@ -491,7 +505,6 @@
 
       .impressions-close {
         top: 6px;
-        left: auto;
         right: 10px;
       }
 
@@ -770,7 +783,10 @@
 
     <div class="impressions-lightbox" id="impressions-lightbox" data-impressions-overlay aria-hidden="true" hidden>
       <div class="impressions-panel" role="dialog" aria-modal="true" aria-label="Impressions" data-impressions-panel>
-        <button class="impressions-close" type="button" data-impressions-close aria-label="Close">&larr;</button>
+        <button class="impressions-close" type="button" data-impressions-close aria-label="Close">
+          <span class="impressions-close-icon" aria-hidden="true">X</span>
+          <span class="impressions-close-label" data-impressions-close-label>Close</span>
+        </button>
         <div class="impressions-body">
           <iframe class="impressions-frame" data-impressions-frame data-impressions-src="impressions/index.html" title="Impressions" loading="lazy"></iframe>
         </div>
@@ -792,6 +808,7 @@
 	    const impressionsPanel = document.querySelector('[data-impressions-panel]');
 	    const impressionsFrame = document.querySelector('[data-impressions-frame]');
 	    const impressionsClose = document.querySelector('[data-impressions-close]');
+	    const impressionsCloseLabel = document.querySelector('[data-impressions-close-label]');
 	    const mainFrame = document.querySelector('.frame');
 	    const impressionsSrc = impressionsFrame?.dataset.impressionsSrc || 'impressions/index.html';
 	    const shareSeparators = [];
@@ -902,6 +919,15 @@
       },
     };
 
+    function trackEvent(name, props = {}) {
+      if (typeof window.plausible !== 'function') return;
+      try {
+        window.plausible(name, { props });
+      } catch {
+        // ignore analytics failures
+      }
+    }
+
     function toggleLanguageContent({ current, pdfLang, labels }) {
       for (const button of languageButtons) {
         const isActive = button.getAttribute('data-lang') === current;
@@ -945,6 +971,7 @@
       if (impressionsClose) {
         impressionsClose.setAttribute('aria-label', labels.close);
       }
+      if (impressionsCloseLabel) impressionsCloseLabel.textContent = labels.close;
     }
 
     function updateSharing({ labels }) {
@@ -1054,7 +1081,14 @@
     for (const link of impressionsLinks) {
       link.addEventListener('click', (event) => {
         event.preventDefault();
+        trackEvent('Impressions Open', { lang: document.documentElement.lang || '' });
         openImpressionsOverlay();
+      });
+    }
+
+    for (const link of menuLinks) {
+      link.addEventListener('click', () => {
+        trackEvent('Menu PDF', { href: link.getAttribute('href') || '', lang: document.documentElement.lang || '' });
       });
     }
 
@@ -1101,6 +1135,7 @@
 	    for (const button of languageButtons) {
 	      button.addEventListener('click', (event) => {
 	        event.preventDefault();
+        trackEvent('Language Switch', { lang: button.getAttribute('data-lang') || '' });
 	        setLanguage(button.getAttribute('data-lang'));
 	      });
 	    }
@@ -1108,6 +1143,7 @@
       for (const button of homeLanguageButtons) {
         button.addEventListener('click', (event) => {
           event.preventDefault();
+          trackEvent('Language Switch', { lang: button.getAttribute('data-lang-home') || '' });
           setLanguage(button.getAttribute('data-lang-home') || 'es');
         });
       }
