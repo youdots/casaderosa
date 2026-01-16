@@ -319,6 +319,11 @@ button,
         const READY_MESSAGE = { type: "cdr-impressions-ready" };
         const READY_REQUEST_TYPE = "cdr-impressions-request-ready";
         let impressionsReady = false;
+        const trackedImages = new WeakSet();
+        const trackedVideos = new WeakSet();
+        const trackedBackgrounds = new Set();
+        const observedRoots = new WeakSet();
+        const readyObservers = [];
 
         const notifyReady = () => {
           if (!window.parent) return;
@@ -329,39 +334,106 @@ button,
           }
         };
 
-        const isContentReady = () => {
-          const grid = document.querySelector(".grid-layout");
-          if (grid && grid.children.length > 0) return true;
-          const component = document.querySelector(".commonninja_component");
-          if (component && component.shadowRoot) {
-            const items = component.shadowRoot.querySelectorAll(
-              ".feed-content-item, .feed-content-item article"
-            );
-            if (items.length > 0) return true;
-          }
-          return false;
-        };
-
-        const checkReady = () => {
+        const markReady = () => {
           if (impressionsReady) return;
-          if (isContentReady()) {
-            impressionsReady = true;
-            notifyReady();
+          impressionsReady = true;
+          for (const observer of readyObservers) {
+            observer.disconnect();
+          }
+          notifyReady();
+        };
+
+        const watchImage = (img) => {
+          if (!img || trackedImages.has(img)) return;
+          trackedImages.add(img);
+          if (img.complete && img.naturalWidth > 0) {
+            markReady();
+            return;
+          }
+          img.addEventListener("load", markReady, { once: true });
+        };
+
+        const watchVideo = (video) => {
+          if (!video || trackedVideos.has(video)) return;
+          trackedVideos.add(video);
+          if (video.readyState >= 2) {
+            markReady();
+            return;
+          }
+          video.addEventListener("loadeddata", markReady, { once: true });
+        };
+
+        const watchBackground = (url) => {
+          if (!url || trackedBackgrounds.has(url)) return;
+          trackedBackgrounds.add(url);
+          const image = new Image();
+          image.addEventListener("load", markReady, { once: true });
+          image.src = url;
+        };
+
+        const scanForMedia = (root) => {
+          if (impressionsReady) return;
+          if (!root || typeof root.querySelectorAll !== "function") return;
+          const images = root.querySelectorAll("img");
+          for (const img of images) {
+            watchImage(img);
+            if (impressionsReady) return;
+          }
+          const videos = root.querySelectorAll("video");
+          for (const video of videos) {
+            watchVideo(video);
+            if (impressionsReady) return;
+          }
+          const bgCandidates = root.querySelectorAll('[style*="background-image"]');
+          for (const el of bgCandidates) {
+            const bg = window.getComputedStyle(el).backgroundImage;
+            if (!bg || bg === "none" || bg.includes("gradient")) continue;
+            const match = bg.match(/url\((['"]?)(.*?)\1\)/i);
+            if (match && match[2]) {
+              watchBackground(match[2]);
+              if (impressionsReady) return;
+            }
           }
         };
 
-        const readyObserver = new MutationObserver(checkReady);
-        readyObserver.observe(document.documentElement, { childList: true, subtree: true });
-        window.addEventListener("load", checkReady);
+        const ensureShadowObservers = (root) => {
+          if (!root || typeof root.querySelectorAll !== "function") return;
+          const components = root.querySelectorAll(".commonninja_component");
+          for (const component of components) {
+            if (component.shadowRoot) {
+              observeRoot(component.shadowRoot);
+            }
+          }
+        };
+
+        const observeRoot = (root) => {
+          if (!root || observedRoots.has(root)) return;
+          observedRoots.add(root);
+          const observer = new MutationObserver(() => {
+            if (impressionsReady) return;
+            scanForMedia(root);
+            ensureShadowObservers(root);
+          });
+          observer.observe(root, { childList: true, subtree: true });
+          readyObservers.push(observer);
+          scanForMedia(root);
+          ensureShadowObservers(root);
+        };
+
+        observeRoot(document.documentElement);
+        window.addEventListener("load", () => {
+          scanForMedia(document.documentElement);
+          ensureShadowObservers(document.documentElement);
+        });
 
         window.addEventListener("message", (event) => {
           if (event.origin !== window.location.origin) return;
           if (!event.data || event.data.type !== READY_REQUEST_TYPE) return;
           if (impressionsReady) {
             notifyReady();
-          } else {
-            checkReady();
+            return;
           }
+          scanForMedia(document.documentElement);
         });
       })();
     </script>
