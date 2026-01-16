@@ -98,11 +98,18 @@ body {
   background-color: var(--cdr-bg) !important;
 }
 .ft-header-button,
-.ft-header-button * {
+.feed-follow-button {
   color: var(--cdr-text) !important;
-  border-color: var(--cdr-text) !important;
   background: transparent !important;
   background-color: transparent !important;
+  border: 1px solid var(--cdr-text) !important;
+  box-shadow: none !important;
+  -webkit-text-fill-color: var(--cdr-text) !important;
+}
+.ft-header-button *,
+.feed-follow-button * {
+  color: var(--cdr-text) !important;
+  -webkit-text-fill-color: var(--cdr-text) !important;
 }
 .commonninja-ribbon,
 [class*="commonninja-ribbon"] {
@@ -141,15 +148,22 @@ body {
   background-color: transparent !important;
 }
 .feed-follow-button,
-.feed-follow-button *,
 .ft-header-button,
-.ft-header-button *,
 button,
 [role="button"] {
   color: var(--cdr-text) !important;
-  border-color: var(--cdr-text) !important;
   background: transparent !important;
   background-color: transparent !important;
+  border: 1px solid var(--cdr-text) !important;
+  box-shadow: none !important;
+  -webkit-text-fill-color: var(--cdr-text) !important;
+}
+.feed-follow-button *,
+.ft-header-button *,
+button *,
+[role="button"] * {
+  color: var(--cdr-text) !important;
+  -webkit-text-fill-color: var(--cdr-text) !important;
 }
 .feed-content-social-share,
 .feed-content-social-share *,
@@ -255,13 +269,15 @@ button,
 
             const shadowFollowButtons = component.shadowRoot.querySelectorAll(
               ".feed-follow-button, .feed-follow-button *, " +
-                ".ft-header-button, .ft-header-button *"
+                ".ft-header-button, .ft-header-button *, " +
+                "button, [role=\"button\"], button *, [role=\"button\"] *"
             );
             for (const el of shadowFollowButtons) {
               el.style.setProperty("color", TEXT_COLOR, "important");
-              el.style.setProperty("border-color", TEXT_COLOR, "important");
               el.style.setProperty("background", "transparent", "important");
               el.style.setProperty("background-color", "transparent", "important");
+              el.style.setProperty("border", `1px solid ${TEXT_COLOR}`, "important");
+              el.style.setProperty("-webkit-text-fill-color", TEXT_COLOR, "important");
             }
           }
         };
