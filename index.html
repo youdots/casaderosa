@@ -362,7 +362,7 @@
 
     .impressions-panel {
       position: relative;
-      width: min(1100px, 100%);
+      width: 100%;
       height: 100%;
       background: var(--canvas);
       display: flex;
@@ -373,9 +373,9 @@
     .impressions-close {
       appearance: none;
       -webkit-appearance: none;
-      border: 1px solid var(--accent);
-      background: var(--canvas);
-      color: inherit;
+      border: none;
+      background: var(--accent);
+      color: var(--canvas);
       font: inherit;
       border-radius: 999px;
       width: 34px;
@@ -779,10 +779,12 @@
 	    const impressionsFrame = document.querySelector('[data-impressions-frame]');
 	    const impressionsClose = document.querySelector('[data-impressions-close]');
 	    const mainFrame = document.querySelector('.frame');
-      const impressionsSrc = impressionsFrame?.dataset.impressionsSrc || 'impressions/index.html';
+	    const impressionsSrc = impressionsFrame?.dataset.impressionsSrc || 'impressions/index.html';
 	    const shareSeparators = [];
 	    const focusableLinks = Array.from(document.querySelectorAll('a.link'));
       let impressionsLastFocus = null;
+      let impressionsHistoryEntry = false;
+      let suppressPopstate = false;
 
     const ui = {
       en: {
@@ -950,8 +952,9 @@
       }
     }
 
-    function openImpressionsOverlay() {
-      if (!impressionsOverlay) return;
+    function openImpressionsOverlay(options = {}) {
+      if (!impressionsOverlay || impressionsOverlay.hidden === false) return;
+      const { skipHistory = false } = options;
       impressionsLastFocus = document.activeElement;
       impressionsOverlay.hidden = false;
       impressionsOverlay.setAttribute('aria-hidden', 'false');
@@ -963,11 +966,15 @@
       if (impressionsFrame && !impressionsFrame.getAttribute('src')) {
         impressionsFrame.setAttribute('src', impressionsSrc);
       }
+      if (!skipHistory && !impressionsHistoryEntry) {
+        impressionsHistoryEntry = true;
+        history.pushState({ impressions: true }, '', '#impressions');
+      }
       setImpressionsExpanded(true);
       if (impressionsClose) impressionsClose.focus();
     }
 
-    function closeImpressionsOverlay() {
+    function closeImpressionsOverlay(source = 'user') {
       if (!impressionsOverlay || impressionsOverlay.hidden) return;
       impressionsOverlay.hidden = true;
       impressionsOverlay.setAttribute('aria-hidden', 'true');
@@ -977,6 +984,13 @@
         mainFrame.removeAttribute('inert');
       }
       setImpressionsExpanded(false);
+      if (source !== 'popstate' && impressionsHistoryEntry) {
+        impressionsHistoryEntry = false;
+        if (history.state && history.state.impressions) {
+          suppressPopstate = true;
+          history.back();
+        }
+      }
       if (impressionsLastFocus && impressionsLastFocus.focus) {
         impressionsLastFocus.focus();
       }
@@ -1050,6 +1064,23 @@
       if (impressionsOverlay && !impressionsOverlay.hidden) {
         event.preventDefault();
         closeImpressionsOverlay();
+      }
+    });
+
+    window.addEventListener('popstate', (event) => {
+      if (suppressPopstate) {
+        suppressPopstate = false;
+        return;
+      }
+      const isImpressionsState = Boolean(event.state && event.state.impressions);
+      if (isImpressionsState) {
+        openImpressionsOverlay({ skipHistory: true });
+        impressionsHistoryEntry = true;
+        return;
+      }
+      impressionsHistoryEntry = false;
+      if (impressionsOverlay && !impressionsOverlay.hidden) {
+        closeImpressionsOverlay('popstate');
       }
     });
 
