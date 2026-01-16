@@ -20,10 +20,9 @@
       }
 
       #ft-insta-brd {
-        margin: 0;
-        padding: 0;
+        margin: 0 !important;
+        padding: 0 !important;
       }
-
     </style>
   </head>
   <body>
@@ -57,42 +56,107 @@
       <div class="commonninja_component pid-c9570fd1-c5cc-4cc9-893e-1fbffbb92d2c"></div>
     </div>
     <script>
-      const applyOverrides = () => {
-        const targets = document.querySelectorAll(
-          ".commonninja-ribbon, [class*=\"commonninja-ribbon\"]"
-        );
-        for (const el of targets) {
-          el.style.setProperty("display", "none", "important");
-          el.style.setProperty("visibility", "hidden", "important");
-        }
+      (() => {
+        const OVERRIDE_STYLE_ID = "impressions-overrides";
+        const OVERRIDE_CSS = `
+#ft-insta-brd {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.commonninja-ribbon,
+[class*="commonninja-ribbon"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+}
+.feed-header,
+.ft-header {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+.ft-sff,
+.ft-sff * {
+  font-family: "Sora", "Inter", sans-serif !important;
+}
+        `;
 
-        const headers = document.querySelectorAll(".feed-header");
-        for (const el of headers) {
-          el.style.setProperty("background-color", "transparent", "important");
-        }
+        const ensureOverrideStyle = () => {
+          let style = document.getElementById(OVERRIDE_STYLE_ID);
+          if (!style) {
+            style = document.createElement("style");
+            style.id = OVERRIDE_STYLE_ID;
+            style.textContent = OVERRIDE_CSS;
+          } else if (style.textContent !== OVERRIDE_CSS) {
+            style.textContent = OVERRIDE_CSS;
+          }
 
-        const fontTargets = document.querySelectorAll("body, .feed, .feed *");
-        for (const el of fontTargets) {
-          el.style.setProperty("font-family", "\"Sora\", \"Inter\", sans-serif", "important");
-        }
-      };
+          const head = document.head || document.documentElement;
+          const anchor = document.getElementById("ft-fsocial-style");
+          if (anchor && anchor.parentNode) {
+            if (anchor.nextSibling !== style) {
+              if (style.parentNode) {
+                style.parentNode.removeChild(style);
+              }
+              anchor.parentNode.insertBefore(style, anchor.nextSibling);
+            }
+          } else if (!style.parentNode) {
+            head.appendChild(style);
+          } else if (style.parentNode === head && head.lastChild !== style) {
+            head.appendChild(style);
+          }
+        };
 
-      const observer = new MutationObserver(() => applyOverrides());
-      observer.observe(document.body, { childList: true, subtree: true });
-      window.addEventListener("load", applyOverrides);
-      setTimeout(applyOverrides, 500);
-      setTimeout(applyOverrides, 2000);
+        const applyInlineOverrides = () => {
+          const brd = document.getElementById("ft-insta-brd");
+          if (brd) {
+            brd.style.setProperty("margin", "0", "important");
+            brd.style.setProperty("padding", "0", "important");
+          }
+
+          const ribbons = document.querySelectorAll(
+            ".commonninja-ribbon, [class*=\"commonninja-ribbon\"]"
+          );
+          for (const el of ribbons) {
+            el.style.setProperty("display", "none", "important");
+            el.style.setProperty("visibility", "hidden", "important");
+            el.style.setProperty("opacity", "0", "important");
+            el.style.setProperty("pointer-events", "none", "important");
+            el.style.setProperty("height", "0", "important");
+          }
+
+          const headers = document.querySelectorAll(".feed-header, .ft-header");
+          for (const el of headers) {
+            el.style.setProperty("background-color", "transparent", "important");
+            el.style.setProperty("background-image", "none", "important");
+          }
+
+          const fontTargets = document.querySelectorAll(".ft-sff, .ft-sff *");
+          for (const el of fontTargets) {
+            el.style.setProperty("font-family", "\"Sora\", \"Inter\", sans-serif", "important");
+          }
+        };
+
+        const applyOverrides = () => {
+          ensureOverrideStyle();
+          applyInlineOverrides();
+        };
+
+        const observer = new MutationObserver(applyOverrides);
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+        window.addEventListener("load", applyOverrides);
+        applyOverrides();
+
+        let tries = 0;
+        const interval = setInterval(() => {
+          applyOverrides();
+          tries += 1;
+          if (tries >= 12) {
+            clearInterval(interval);
+          }
+        }, 500);
+      })();
     </script>
-    <style>
-      .commonninja-ribbon,
-      [class*="commonninja-ribbon"] {
-        display: none !important;
-        visibility: hidden !important;
-      }
-
-      .feed-header {
-        background-color: transparent !important;
-      }
-    </style>
   </body>
 </html>
