@@ -1038,6 +1038,7 @@
         mainFrame.setAttribute('inert', '');
       }
       if (impressionsFrame && !impressionsFrame.getAttribute('src')) {
+        impressionsLoaded = false;
         impressionsFrame.setAttribute('src', impressionsSrc);
       }
       if (impressionsSpinner) {
@@ -1124,6 +1125,7 @@
 
     if (impressionsFrame) {
       impressionsFrame.addEventListener('load', () => {
+        if (!impressionsFrame.getAttribute('src')) return;
         impressionsLoaded = true;
         if (impressionsSpinner) impressionsSpinner.setAttribute('hidden', '');
       });
