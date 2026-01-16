@@ -8,7 +8,7 @@
       @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700&display=swap");
 
       :root {
-        --cdr-bg: rgb(226 217 213);
+        --cdr-bg: #e2d9d5;
       }
 
       html,
@@ -44,7 +44,7 @@
             gap: 15,
             direction: "down",
             height: 700,
-            bgColor: "rgb(226 217 213)",
+            bgColor: "#e2d9d5",
             txtColor: "rgb(160 71 26)",
             ukey: "e3b1eac8-5e34-4219-be80-238c176faad0",
           },
@@ -57,7 +57,9 @@
     </div>
     <script>
       (() => {
+        const BG_COLOR = "#e2d9d5";
         const OVERRIDE_STYLE_ID = "impressions-overrides";
+        const SHADOW_OVERRIDE_STYLE_ID = "impressions-overrides-shadow";
         const OVERRIDE_CSS = `
 #ft-insta-brd {
   margin: 0 !important;
@@ -73,12 +75,34 @@
 }
 .feed-header,
 .ft-header {
-  background-color: transparent !important;
+  background-color: ${BG_COLOR} !important;
   background-image: none !important;
 }
 .ft-sff,
 .ft-sff * {
   font-family: "Sora", "Inter", sans-serif !important;
+  background-color: ${BG_COLOR} !important;
+  background: ${BG_COLOR} !important;
+}
+#ft-insta-app,
+.commonninja_component {
+  background-color: ${BG_COLOR} !important;
+  background: ${BG_COLOR} !important;
+}
+        `;
+        const SHADOW_OVERRIDE_CSS = `
+:host,
+:host * {
+  background-color: ${BG_COLOR} !important;
+  background: ${BG_COLOR} !important;
+}
+.commonninja-ribbon,
+[class*="commonninja-ribbon"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
 }
         `;
 
@@ -108,11 +132,34 @@
           }
         };
 
+        const ensureShadowOverrideStyle = (shadowRoot) => {
+          if (!shadowRoot) {
+            return;
+          }
+          let style = shadowRoot.querySelector(`#${SHADOW_OVERRIDE_STYLE_ID}`);
+          if (!style) {
+            style = document.createElement("style");
+            style.id = SHADOW_OVERRIDE_STYLE_ID;
+            style.textContent = SHADOW_OVERRIDE_CSS;
+            shadowRoot.appendChild(style);
+          } else if (style.textContent !== SHADOW_OVERRIDE_CSS) {
+            style.textContent = SHADOW_OVERRIDE_CSS;
+          }
+        };
+
         const applyInlineOverrides = () => {
           const brd = document.getElementById("ft-insta-brd");
           if (brd) {
             brd.style.setProperty("margin", "0", "important");
             brd.style.setProperty("padding", "0", "important");
+            brd.style.setProperty("background-color", BG_COLOR, "important");
+            brd.style.setProperty("background", BG_COLOR, "important");
+          }
+
+          const app = document.getElementById("ft-insta-app");
+          if (app) {
+            app.style.setProperty("background-color", BG_COLOR, "important");
+            app.style.setProperty("background", BG_COLOR, "important");
           }
 
           const ribbons = document.querySelectorAll(
@@ -128,13 +175,36 @@
 
           const headers = document.querySelectorAll(".feed-header, .ft-header");
           for (const el of headers) {
-            el.style.setProperty("background-color", "transparent", "important");
-            el.style.setProperty("background-image", "none", "important");
+            el.style.setProperty("background-color", BG_COLOR, "important");
+            el.style.setProperty("background", BG_COLOR, "important");
           }
 
           const fontTargets = document.querySelectorAll(".ft-sff, .ft-sff *");
           for (const el of fontTargets) {
             el.style.setProperty("font-family", "\"Sora\", \"Inter\", sans-serif", "important");
+            el.style.setProperty("background-color", BG_COLOR, "important");
+            el.style.setProperty("background", BG_COLOR, "important");
+          }
+
+          const components = document.querySelectorAll(".commonninja_component");
+          for (const component of components) {
+            component.style.setProperty("--cdr-bg", BG_COLOR, "important");
+            component.style.setProperty("background-color", BG_COLOR, "important");
+            component.style.setProperty("background", BG_COLOR, "important");
+            ensureShadowOverrideStyle(component.shadowRoot);
+
+            if (component.shadowRoot) {
+              const shadowRibbons = component.shadowRoot.querySelectorAll(
+                ".commonninja-ribbon, [class*=\"commonninja-ribbon\"]"
+              );
+              for (const el of shadowRibbons) {
+                el.style.setProperty("display", "none", "important");
+                el.style.setProperty("visibility", "hidden", "important");
+                el.style.setProperty("opacity", "0", "important");
+                el.style.setProperty("pointer-events", "none", "important");
+                el.style.setProperty("height", "0", "important");
+              }
+            }
           }
         };
 
