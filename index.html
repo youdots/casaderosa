@@ -847,6 +847,8 @@
 	    const menuLinks = Array.from(document.querySelectorAll('[data-action="menu"]'));
 	    const impressionsLinks = Array.from(document.querySelectorAll('[data-action="impressions"]'));
 	    const shareButtons = Array.from(document.querySelectorAll('[data-action="share"]'));
+      const addressLinks = Array.from(document.querySelectorAll('.address-link'));
+      const fallbackMenuLinks = Array.from(document.querySelectorAll('[data-lang-fallback] a.link'));
 	    const impressionsOverlay = document.querySelector('[data-impressions-overlay]');
 	    const impressionsPanel = document.querySelector('[data-impressions-panel]');
 	    const impressionsFrame = document.querySelector('[data-impressions-frame]');
@@ -861,6 +863,7 @@
       let impressionsHistoryEntry = false;
       let suppressPopstate = false;
       let impressionsLoaded = false;
+      let impressionsOpenedAt = null;
 
     const ui = {
       en: {
@@ -964,10 +967,46 @@
       },
     };
 
+    function getViewport() {
+      return window.matchMedia('(max-width: 900px)').matches ? 'mobile' : 'desktop';
+    }
+
+    function buildTrackingProps(props = {}) {
+      return {
+        lang: document.documentElement.lang || '',
+        viewport: getViewport(),
+        ...props,
+      };
+    }
+
+    function getActionPlacement(element) {
+      if (element.closest('.actions')) return 'nav';
+      if (element.closest('.desktop-actions')) return 'inline';
+      return 'unknown';
+    }
+
+    function getAddressPlacement(element) {
+      if (element.closest('.address-bar')) return 'bar';
+      if (element.closest('.address-row-wrap')) return 'inline';
+      return 'unknown';
+    }
+
+    function getPdfLang(href) {
+      const normalized = String(href || '').toLowerCase();
+      if (normalized.includes('-es.pdf')) return 'es';
+      if (normalized.includes('-en.pdf')) return 'en';
+      return '';
+    }
+
+    function getFallbackLang(element) {
+      const block = element.closest('[data-lang-fallback]');
+      return block ? block.getAttribute('data-lang-fallback') || '' : '';
+    }
+
     function trackEvent(name, props = {}) {
       if (typeof window.plausible !== 'function') return;
       try {
-        window.plausible(name, { props });
+        window.plausible(name, { props: buildTrackingProps(props) });
       } catch {
         // ignore analytics failures
       }
@@ -1040,7 +1079,7 @@
 
     function openImpressionsOverlay(options = {}) {
       if (!impressionsOverlay || impressionsOverlay.hidden === false) return;
-      const { skipHistory = false } = options;
+      const { skipHistory = false, source = '', placement = '' } = options;
       impressionsLastFocus = document.activeElement;
       impressionsOverlay.hidden = false;
       impressionsOverlay.setAttribute('aria-hidden', 'false');
@@ -1062,9 +1101,15 @@
       }
       setImpressionsExpanded(true);
       if (impressionsClose) impressionsClose.focus();
+      impressionsOpenedAt = Date.now();
+      if (source) {
+        const props = { source };
+        if (placement) props.placement = placement;
+        trackEvent('Impressions Open', props);
+      }
     }
 
-    function closeImpressionsOverlay(source = 'user') {
+    function closeImpressionsOverlay(source = 'unknown') {
       if (!impressionsOverlay || impressionsOverlay.hidden) return;
       impressionsOverlay.hidden = true;
       impressionsOverlay.setAttribute('aria-hidden', 'true');
@@ -1084,6 +1129,12 @@
       if (impressionsLastFocus && impressionsLastFocus.focus) {
         impressionsLastFocus.focus();
       }
+      const durationMs = impressionsOpenedAt ? Date.now() - impressionsOpenedAt : null;
+      impressionsOpenedAt = null;
+      const trackSource = source === 'popstate' ? 'history' : source;
+      const props = { source: trackSource };
+      if (durationMs !== null) props.duration_ms = Math.round(durationMs);
+      trackEvent('Impressions Close', props);
     }
 
     function getDefaultLanguage() {
@@ -1130,14 +1181,21 @@
     for (const link of impressionsLinks) {
       link.addEventListener('click', (event) => {
         event.preventDefault();
-        trackEvent('Impressions Open', { lang: document.documentElement.lang || '' });
-        openImpressionsOverlay();
+        openImpressionsOverlay({
+          source: 'link',
+          placement: getActionPlacement(link),
+        });
       });
     }
 
     if (impressionsFrame) {
       impressionsFrame.addEventListener('load', () => {
         if (!impressionsFrame.getAttribute('src')) return;
+        if (!impressionsLoaded) {
+          trackEvent('Impressions Load', {
+            src: impressionsFrame.getAttribute('src') || '',
+          });
+        }
         impressionsLoaded = true;
         if (impressionsSpinner) impressionsSpinner.setAttribute('hidden', '');
       });
@@ -1145,21 +1203,48 @@
 
     for (const link of menuLinks) {
       link.addEventListener('click', () => {
-        trackEvent('Menu PDF', { href: link.getAttribute('href') || '', lang: document.documentElement.lang || '' });
+        const href = link.getAttribute('href') || '';
+        trackEvent('Menu PDF', {
+          href,
+          pdf_lang: getPdfLang(href),
+          placement: getActionPlacement(link),
+        });
+      });
+    }
+
+    for (const link of fallbackMenuLinks) {
+      link.addEventListener('click', () => {
+        const href = link.getAttribute('href') || '';
+        trackEvent('Menu PDF Fallback', {
+          href,
+          pdf_lang: getPdfLang(href),
+          fallback_lang: getFallbackLang(link),
+          placement: 'fallback',
+        });
+      });
+    }
+
+    for (const link of addressLinks) {
+      link.addEventListener('click', () => {
+        const href = link.getAttribute('href') || '';
+        trackEvent('Map Click', {
+          href,
+          placement: getAddressPlacement(link),
+        });
       });
     }
 
     if (impressionsClose) {
       impressionsClose.addEventListener('click', (event) => {
         event.preventDefault();
-        closeImpressionsOverlay();
+        closeImpressionsOverlay('button');
       });
     }
 
     if (impressionsOverlay) {
       impressionsOverlay.addEventListener('click', (event) => {
         if (event.target === impressionsOverlay) {
-          closeImpressionsOverlay();
+          closeImpressionsOverlay('overlay');
         }
       });
     }
@@ -1168,7 +1253,7 @@
       if (event.key !== 'Escape') return;
       if (impressionsOverlay && !impressionsOverlay.hidden) {
         event.preventDefault();
-        closeImpressionsOverlay();
+        closeImpressionsOverlay('escape');
       }
     });
 
@@ -1179,7 +1264,7 @@
       }
       const isImpressionsState = Boolean(event.state && event.state.impressions);
       if (isImpressionsState) {
-        openImpressionsOverlay({ skipHistory: true });
+        openImpressionsOverlay({ skipHistory: true, source: 'history' });
         impressionsHistoryEntry = true;
         return;
       }
@@ -1192,16 +1277,24 @@
 	    for (const button of languageButtons) {
 	      button.addEventListener('click', (event) => {
 	        event.preventDefault();
-        trackEvent('Language Switch', { lang: button.getAttribute('data-lang') || '' });
-	        setLanguage(button.getAttribute('data-lang'));
+        const nextLang = button.getAttribute('data-lang') || '';
+        trackEvent('Language Switch', {
+          lang: nextLang,
+          from_lang: document.documentElement.lang || '',
+        });
+	        setLanguage(nextLang);
 	      });
 	    }
 
       for (const button of homeLanguageButtons) {
         button.addEventListener('click', (event) => {
           event.preventDefault();
-          trackEvent('Language Switch', { lang: button.getAttribute('data-lang-home') || '' });
-          setLanguage(button.getAttribute('data-lang-home') || 'es');
+          const nextLang = button.getAttribute('data-lang-home') || 'es';
+          trackEvent('Language Switch', {
+            lang: nextLang,
+            from_lang: document.documentElement.lang || '',
+          });
+          setLanguage(nextLang);
         });
       }
 
@@ -1209,11 +1302,14 @@
 	      button.addEventListener('click', async (event) => {
 	        event.preventDefault();
 	        if (!navigator.share) return;
+        const placement = getActionPlacement(button);
         try {
           const title = button.dataset.shareTitle || 'Casa de Rosa';
+          trackEvent('Share', { placement, status: 'attempt' });
           await navigator.share({ title, url: 'https://casaderosaibiza.com/' });
+          trackEvent('Share', { placement, status: 'success' });
         } catch {
-          // ignore cancel
+          trackEvent('Share', { placement, status: 'cancel' });
         }
       });
 	    }
