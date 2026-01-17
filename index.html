@@ -1204,9 +1204,12 @@
           history.back();
         }
       }
-      blurIfPointer(impressionsLastFocus);
-      if (impressionsLastFocus && impressionsLastFocus.focus) {
-        impressionsLastFocus.focus();
+      if (lastInputType !== 'pointer') {
+        if (impressionsLastFocus && impressionsLastFocus.focus) {
+          impressionsLastFocus.focus();
+        }
+      } else {
+        blurIfPointer(impressionsLastFocus);
       }
       const durationMs = impressionsOpenedAt ? Date.now() - impressionsOpenedAt : null;
       impressionsOpenedAt = null;
