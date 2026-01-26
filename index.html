@@ -3,12 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="/">
   <title>Casa de Rosa | Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls</title>
   <meta name="description" content="Casa de Rosa &mdash; Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls &mdash; Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears.">
   <meta name="theme-color" content="#E2D9D5">
   <meta name="color-scheme" content="light">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://casaderosaibiza.com/">
+  <link rel="alternate" hreflang="x-default" href="https://casaderosaibiza.com/">
+  <link rel="alternate" hreflang="en" href="https://casaderosaibiza.com/en/">
+  <link rel="alternate" hreflang="es" href="https://casaderosaibiza.com/es/">
+  <link rel="alternate" hreflang="de" href="https://casaderosaibiza.com/de/">
+  <link rel="alternate" hreflang="fr" href="https://casaderosaibiza.com/fr/">
+  <link rel="alternate" hreflang="nl" href="https://casaderosaibiza.com/nl/">
+  <link rel="alternate" hreflang="pt" href="https://casaderosaibiza.com/pt/">
+  <link rel="alternate" hreflang="he" href="https://casaderosaibiza.com/he/">
+  <link rel="alternate" hreflang="ar" href="https://casaderosaibiza.com/ar/">
+  <link rel="alternate" hreflang="it" href="https://casaderosaibiza.com/it/">
+  <link rel="alternate" hreflang="ru" href="https://casaderosaibiza.com/ru/">
+  <link rel="alternate" hreflang="uk" href="https://casaderosaibiza.com/ua/">
 
   <link rel="icon" href="Logo-Signet-CdR-Red-Light.svg" type="image/svg+xml">
   <link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
@@ -897,6 +910,19 @@
       let lastInputType = 'keyboard';
       const IMPRESSIONS_READY_MESSAGE = 'cdr-impressions-ready';
       const IMPRESSIONS_REQUEST_MESSAGE = 'cdr-impressions-request-ready';
+      const LANGUAGE_PATHS = {
+        en: 'en',
+        es: 'es',
+        de: 'de',
+        fr: 'fr',
+        nl: 'nl',
+        pt: 'pt',
+        he: 'he',
+        ar: 'ar',
+        it: 'it',
+        ru: 'ru',
+        ua: 'ua',
+      };
 
     const ui = {
       en: {
@@ -999,6 +1025,22 @@
         langTag: 'it',
       },
     };
+
+    function buildLanguagePath(lang) {
+      const segment = LANGUAGE_PATHS[lang] || '';
+      return segment ? `/${segment}/` : '/';
+    }
+
+    function buildLanguageUrl(lang) {
+      return `https://casaderosaibiza.com${buildLanguagePath(lang)}`;
+    }
+
+    function getPathLanguage() {
+      const normalized = window.location.pathname.replace(/^\/+|\/+$/g, '');
+      if (!normalized) return '';
+      const segment = normalized.split('/')[0].toLowerCase();
+      return Object.prototype.hasOwnProperty.call(ui, segment) ? segment : '';
+    }
 
     function getViewport() {
       return window.matchMedia('(max-width: 900px)').matches ? 'mobile' : 'desktop';
@@ -1140,12 +1182,13 @@
       if (impressionsCloseLabel) impressionsCloseLabel.textContent = labels.close;
     }
 
-    function updateSharing({ labels }) {
+    function updateSharing({ labels, shareUrl }) {
       const canShare = Boolean(navigator.share);
       for (const button of shareButtons) {
         button.textContent = labels.share;
         button.style.display = canShare ? '' : 'none';
         button.dataset.shareTitle = labels.shareTitle;
+        button.dataset.shareUrl = shareUrl;
       }
     }
 
@@ -1220,6 +1263,8 @@
     }
 
     function getDefaultLanguage() {
+      const pathLanguage = getPathLanguage();
+      if (pathLanguage) return pathLanguage;
       const locales = Array.isArray(navigator.languages) && navigator.languages.length
         ? navigator.languages
         : [navigator.language];
@@ -1242,19 +1287,36 @@
       return 'en';
     }
 
-	    function setLanguage(lang) {
+	    function setLanguage(lang, options = {}) {
+	      const { updateUrl = false } = options;
 	      const current = Object.prototype.hasOwnProperty.call(ui, lang) ? lang : 'en';
 	      const labels = ui[current];
 	      const pdfLang = current === 'es' ? 'es' : 'en';
+	      const pageUrl = buildLanguageUrl(current);
+	      const hasPathLanguage = Boolean(getPathLanguage());
 
 	      toggleLanguageContent({ current, pdfLang, labels });
-	      updateSharing({ labels });
+	      updateSharing({ labels, shareUrl: pageUrl });
 	      const pageTitle = labels.shareTitle || 'Casa de Rosa';
 	      document.title = pageTitle;
 	      const ogTitle = document.querySelector('meta[property="og:title"]');
 	      if (ogTitle) ogTitle.setAttribute('content', pageTitle);
 	      const twitterTitle = document.querySelector('meta[name="twitter:title"]');
 	      if (twitterTitle) twitterTitle.setAttribute('content', pageTitle);
+	      if (updateUrl || hasPathLanguage) {
+	        const canonical = document.querySelector('link[rel="canonical"]');
+	        if (canonical) canonical.setAttribute('href', pageUrl);
+	        const ogUrl = document.querySelector('meta[property="og:url"]');
+	        if (ogUrl) ogUrl.setAttribute('content', pageUrl);
+	      }
+	      if (updateUrl) {
+	        const nextPath = buildLanguagePath(current);
+	        const nextUrl = `${nextPath}${window.location.search}${window.location.hash}`;
+	        const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+	        if (nextUrl !== currentUrl) {
+	          history.replaceState(history.state, '', nextUrl);
+	        }
+	      }
 
 	      document.documentElement.lang = labels.langTag || current;
 	      window.__cdrCurrentPdf = labels.pdf;
@@ -1390,7 +1452,7 @@
           lang: nextLang,
           from_lang: document.documentElement.lang || '',
         });
-	        setLanguage(nextLang);
+        setLanguage(nextLang, { updateUrl: true });
 	      });
 	    }
 
@@ -1402,7 +1464,7 @@
             lang: nextLang,
             from_lang: document.documentElement.lang || '',
           });
-          setLanguage(nextLang);
+          setLanguage(nextLang, { updateUrl: true });
         });
       }
 
@@ -1413,8 +1475,9 @@
         const placement = getActionPlacement(button);
         try {
           const title = button.dataset.shareTitle || 'Casa de Rosa';
+          const url = button.dataset.shareUrl || 'https://casaderosaibiza.com/';
           trackEvent('Share', { placement, status: 'attempt' });
-          await navigator.share({ title, url: 'https://casaderosaibiza.com/' });
+          await navigator.share({ title, url });
           trackEvent('Share', { placement, status: 'success' });
         } catch {
           trackEvent('Share', { placement, status: 'cancel' });
