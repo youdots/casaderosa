@@ -1,0 +1,37 @@
+{
+  "name": "casaderosaibiza-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static site QA tooling",
+  "scripts": {
+    "serve": "serve . -l 4173",
+    "lint:js": "eslint . --ext .js,.cjs,.mjs",
+    "lint:css": "stylelint \"**/*.{css,scss}\" --allow-empty-input",
+    "lint:html": "htmlhint \"**/*.html\" --ignore \"**/instagram-embed.html\"",
+    "lint:md": "markdownlint-cli2 --config .markdownlint-cli2.yaml",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:md",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "a11y": "start-server-and-test \"npm run serve\" http://127.0.0.1:4173 \"pa11y --config pa11y.config.cjs http://127.0.0.1:4173\"",
+    "lh": "start-server-and-test \"npm run serve\" http://127.0.0.1:4173 \"CHROME_PATH=$(node -e 'const { chromium } = require(\"playwright\"); process.stdout.write(chromium.executablePath())') lighthouse http://127.0.0.1:4173 --quiet --chrome-flags='--headless --no-sandbox' --output=html --output-path=./lighthouse-report.html\"",
+    "e2e": "start-server-and-test \"npm run serve\" http://127.0.0.1:4173 \"playwright test\"",
+    "qa": "npm run lint && npm run format:check && npm run a11y && npm run lh && npm run e2e"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@playwright/test": "^1.58.0",
+    "eslint": "^9.39.2",
+    "globals": "^17.1.0",
+    "htmlhint": "^1.8.0",
+    "lighthouse": "^13.0.1",
+    "markdownlint-cli2": "^0.20.0",
+    "pa11y": "^9.0.1",
+    "prettier": "^3.8.1",
+    "serve": "^14.2.5",
+    "start-server-and-test": "^2.1.3",
+    "stylelint": "^17.0.0",
+    "stylelint-config-standard": "^40.0.0",
+    "svgo": "^4.0.0",
+    "wait-on": "^9.0.3"
+  }
+}

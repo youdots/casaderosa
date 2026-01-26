@@ -1,0 +1,9 @@
+**/node_modules/**
+**/dist/**
+**/build/**
+**/public/**
+**/outputs/**
+instagram-embed.html
+**/instagram-embed.html
+lighthouse-report.html
+**/lighthouse-report.html
