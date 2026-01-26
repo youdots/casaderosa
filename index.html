@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Casa de Rosa | Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears</title>
+  <title>Casa de Rosa | Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls</title>
   <meta name="description" content="Casa de Rosa &mdash; Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls &mdash; Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears.">
   <meta name="theme-color" content="#E2D9D5">
   <meta name="color-scheme" content="light">
@@ -20,7 +20,7 @@
   <meta property="og:url" content="https://casaderosaibiza.com/">
   <meta property="og:site_name" content="Casa de Rosa">
   <meta property="og:locale" content="en_GB">
-  <meta property="og:title" content="Casa de Rosa | Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears">
+  <meta property="og:title" content="Casa de Rosa | Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls">
   <meta property="og:description" content="Casa de Rosa &mdash; Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls &mdash; Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears.">
   <meta property="og:image" content="https://casaderosaibiza.com/Logo-CdR-Red-Light-OG-image.png">
   <meta property="og:image:secure_url" content="https://casaderosaibiza.com/Logo-CdR-Red-Light-OG-image.png">
@@ -30,7 +30,7 @@
   <meta property="og:image:alt" content="Casa de Rosa">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Casa de Rosa | Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears">
+  <meta name="twitter:title" content="Casa de Rosa | Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls">
   <meta name="twitter:description" content="Casa de Rosa &mdash; Healthy Breakfast &amp; Lunch | Specialty Coffee | Vinyls &mdash; Carrer de Font i Quer, 15, 07800 Eivissa, Ibiza, Illes Balears.">
   <meta name="twitter:image" content="https://casaderosaibiza.com/Logo-CdR-Red-Light-OG-image.png">
   <meta name="twitter:image:alt" content="Casa de Rosa">
@@ -913,7 +913,7 @@
         impressions: 'Impresiones',
         close: 'Cerrar',
         share: 'Compartir',
-        shareTitle: 'Casa de Rosa | Desayunos y comida saludable | Café de especialidad | Vinilos',
+        shareTitle: 'Casa de Rosa | Desayunos y comida saludable | café de especialidad | vinilos',
         pdf: 'CdR-Menu-2026-01-26-ES.pdf',
         langTag: 'es',
       },
@@ -931,7 +931,7 @@
         impressions: 'Impressions',
         close: 'Fermer',
         share: 'Partager',
-        shareTitle: 'Casa de Rosa | Petit-déjeuner & déjeuner sains | Café de spécialité | Vinyles',
+        shareTitle: 'Casa de Rosa | Petit-déjeuner & déjeuner sains | café de spécialité | vinyles',
         pdf: 'CdR-Menu-2026-01-26-EN.pdf',
         langTag: 'fr',
       },
@@ -940,7 +940,7 @@
         impressions: 'Impressies',
         close: 'Sluiten',
         share: 'Delen',
-        shareTitle: 'Casa de Rosa | Gezond ontbijt & lunch | Specialty koffie | Vinyl',
+        shareTitle: 'Casa de Rosa | Gezond ontbijt & lunch | specialty koffie | vinyl',
         pdf: 'CdR-Menu-2026-01-26-EN.pdf',
         langTag: 'nl',
       },
@@ -949,7 +949,7 @@
         impressions: 'Impressões',
         close: 'Fechar',
         share: 'Partilhar',
-        shareTitle: 'Casa de Rosa | Pequeno-almoço e almoço saudáveis | Café de especialidade | Vinil',
+        shareTitle: 'Casa de Rosa | Pequeno-almoço e almoço saudáveis | café de especialidade | vinil',
         pdf: 'CdR-Menu-2026-01-26-EN.pdf',
         langTag: 'pt',
       },
@@ -976,7 +976,7 @@
         impressions: 'Враження',
         close: 'Закрити',
         share: 'Поділитися',
-        shareTitle: 'Casa de Rosa | Корисні сніданки та обіди | Спешелті кава | Вініл',
+        shareTitle: 'Casa de Rosa | Корисні сніданки та обіди | спешелті кава | вініл',
         pdf: 'CdR-Menu-2026-01-26-EN.pdf',
         langTag: 'uk',
       },
@@ -985,7 +985,7 @@
         impressions: 'Впечатления',
         close: 'Закрыть',
         share: 'Поделиться',
-        shareTitle: 'Casa de Rosa | Полезные завтраки и обеды | Спешелти-кофе | Винил',
+        shareTitle: 'Casa de Rosa | Полезные завтраки и обеды | спешелти-кофе | винил',
         pdf: 'CdR-Menu-2026-01-26-EN.pdf',
         langTag: 'ru',
       },
@@ -994,7 +994,7 @@
         impressions: 'Impressioni',
         close: 'Chiudi',
         share: 'Condividi',
-        shareTitle: 'Casa de Rosa | Colazione e pranzo salutari | Caffè specialty | Vinili',
+        shareTitle: 'Casa de Rosa | Colazione e pranzo salutari | caffè specialty | vinili',
         pdf: 'CdR-Menu-2026-01-26-EN.pdf',
         langTag: 'it',
       },
@@ -1249,6 +1249,12 @@
 
 	      toggleLanguageContent({ current, pdfLang, labels });
 	      updateSharing({ labels });
+	      const pageTitle = labels.shareTitle || 'Casa de Rosa';
+	      document.title = pageTitle;
+	      const ogTitle = document.querySelector('meta[property="og:title"]');
+	      if (ogTitle) ogTitle.setAttribute('content', pageTitle);
+	      const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+	      if (twitterTitle) twitterTitle.setAttribute('content', pageTitle);
 
 	      document.documentElement.lang = labels.langTag || current;
 	      window.__cdrCurrentPdf = labels.pdf;
